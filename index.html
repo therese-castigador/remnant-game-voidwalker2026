@@ -1,0 +1,1040 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>REMNANTS — A Game About Memory</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link href="https://fonts.googleapis.com/css2?family=Crimson+Text:ital,wght@0,400;0,600;1,400&family=Special+Elite&family=VT323&display=swap" rel="stylesheet">
+<script>
+tailwind.config={theme:{extend:{fontFamily:{title:['"Special Elite"','cursive'],body:['"Crimson Text"','serif'],pixel:['"VT323"','monospace']},colors:{ink:'#0a0806',parchment:'#f5ede0',candle:'#c8933a'},keyframes:{flicker:{'0%,92%,100%':{opacity:'1'},'93%':{opacity:'0.6'},'96%':{opacity:'0.3'}},fadeUp:{from:{opacity:'0',transform:'translateY(6px)'},to:{opacity:'1',transform:'none'}},p2:{'0%,100%':{opacity:'0.3'},'50%':{opacity:'1'}},glow:{'0%,100%':{boxShadow:'none'},'50%':{boxShadow:'0 0 18px rgba(200,147,58,0.65)'}},cflame:{'0%,100%':{transform:'scaleX(1) scaleY(1)'},'33%':{transform:'scaleX(0.82) scaleY(1.12)'},'66%':{transform:'scaleX(1.12) scaleY(0.88)'}},fly:{'0%':{opacity:'0',transform:'translate(0,0)'},'15%':{opacity:'0.9'},'60%':{opacity:'0.5',transform:'translate(70px,-42px)'},'100%':{opacity:'0',transform:'translate(148px,12px)'}}},animation:{flicker:'flicker 6s infinite',fadeUp:'fadeUp 0.4s ease forwards',p2:'p2 2s infinite',glow:'glow 1.4s infinite',cflame:'cflame 1.7s ease-in-out infinite',fly:'fly 8s ease-in-out forwards'}}}}
+</script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:#0a0806;overflow:hidden;}
+.screen{display:none;position:absolute;inset:0;}
+.screen.active{display:flex;}
+.vig{background:radial-gradient(ellipse 100% 100% at 50% 50%,transparent 28%,rgba(0,0,0,0.92) 100%);}
+.scb::-webkit-scrollbar{width:3px;}.scb::-webkit-scrollbar-thumb{background:rgba(200,147,58,0.3);border-radius:2px;}.scb::-webkit-scrollbar-track{background:transparent;}
+input[type=number]::-webkit-inner-spin-button,input[type=number]::-webkit-outer-spin-button{-webkit-appearance:none;}
+input[type=number]{-moz-appearance:textfield;}
+.rl{background:linear-gradient(180deg,#1c1208 0%,#231910 45%,#2c2014 65%,#181008 100%);}
+.ra{background:linear-gradient(180deg,#0f0c1a 0%,#151021 45%,#1c1530 65%,#0c0a14 100%);}
+.rb{background:linear-gradient(160deg,#060404 0%,#0a0806 55%,#080604 100%);}
+.rr{background:radial-gradient(ellipse 70% 70% at 50% 65%,#190e04 0%,#0a0604 60%,#050302 100%);}
+.re{background:linear-gradient(180deg,#060e04 0%,#081206 60%,#060e04 100%);}
+.flame{width:8px;height:13px;background:radial-gradient(ellipse at 50% 85%,#fff 0%,#ffe566 28%,#c8933a 58%,transparent 100%);border-radius:50% 50% 28% 28%;animation:cflame 1.7s ease-in-out infinite;box-shadow:0 0 10px 4px rgba(200,147,58,0.5);}
+#dlgBox{transition:transform 0.28s ease,opacity 0.28s ease;transform:translateY(100%);opacity:0;}
+#dlgBox.open{transform:translateY(0);opacity:1;}
+.iring{position:absolute;width:38px;height:38px;border:2px solid rgba(200,147,58,0.75);border-radius:50%;transform:translate(-50%,-50%);pointer-events:none;animation:glow 1.4s infinite;}
+#tov{position:fixed;inset:0;background:#0a0806;z-index:200;pointer-events:none;opacity:0;transition:opacity 0.45s;}
+#tov.show{opacity:1;pointer-events:all;}
+#ttxt{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-family:'Special Elite',cursive;color:#c8933a;font-size:1rem;letter-spacing:0.4em;text-transform:uppercase;opacity:0;transition:opacity 0.3s 0.15s;}
+#tov.show #ttxt{opacity:1;}
+#rf{position:fixed;inset:0;background:rgba(75,12,12,0.45);z-index:150;pointer-events:none;opacity:0;transition:opacity 0.08s;}
+.kb{display:inline-flex;align-items:center;justify-content:center;width:22px;height:22px;background:rgba(200,147,58,0.12);border:1px solid rgba(200,147,58,0.4);font-family:'VT323',monospace;font-size:14px;color:#c8933a;}
+</style>
+</head>
+<body class="w-screen h-screen overflow-hidden bg-ink text-parchment font-body select-none">
+<div id="tov"><div id="ttxt"></div></div>
+<div id="rf"></div>
+
+
+<div class="screen active flex-col items-center justify-center" id="scrTitle">
+  <div class="absolute inset-0 z-0" style="background:#000;"></div>
+  <div class="vig absolute inset-0 z-0 pointer-events-none"></div>
+  <div class="absolute inset-0 pointer-events-none z-[1]" id="titleFx"></div>
+  <div class="relative z-10 flex flex-col items-center">
+    <img src="assets/remnantlogo-removebg-preview.png" class="relative z-10 w-72 md:w-96 mb-2 drop-shadow-[0_0_40px_rgba(200,147,58,0.4)]" alt="REMNANTS" onerror="this.style.display='none';document.getElementById('titleFallback').style.display='block'"><h1 id="titleFallback" class="font-title text-candle animate-flicker text-center" style="font-size:clamp(3rem,10vw,7rem);letter-spacing:0.35em;text-shadow:0 0 60px rgba(200,147,58,0.4);display:none">REMNANTS</h1>
+    <p class="font-body italic text-parchment/40 tracking-[0.22em] text-sm mt-1">a game about memory and what we leave behind</p>
+    <p class="font-body italic text-parchment/20 text-xs tracking-widest mt-14 mb-5">After The Collapse, only memories remain.</p>
+    <button onclick="startPrologue()" class="font-title text-candle border border-candle/40 px-14 py-3 tracking-[0.35em] uppercase text-sm hover:bg-candle/10 hover:border-candle transition-all duration-300">ENTER THE HOUSE</button>
+    <div class="mt-10 flex flex-col items-center gap-2 opacity-40">
+      <div class="font-title text-[0.58rem] tracking-[0.3em] text-candle/70 mb-1">CONTROLS</div>
+      <div class="flex items-center gap-3 font-pixel text-parchment/60 text-base">
+        <div class="flex flex-col items-center gap-0.5"><span class="kb">W</span><div class="flex gap-0.5"><span class="kb">A</span><span class="kb">S</span><span class="kb">D</span></div></div>
+        <span class="text-parchment/30 text-xs">MOVE</span>
+        <span class="kb">E</span><span class="text-parchment/30 text-xs">INTERACT</span>
+        <span class="kb">F</span><span class="text-parchment/30 text-xs">EXAMINE</span>
+        <span class="kb px-1" style="width:auto">SPC</span><span class="text-parchment/30 text-xs">NEXT</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="screen flex-col items-center justify-end pb-12" id="scrPrologue">
+  <div class="rl absolute inset-0 z-0"></div>
+  <div class="vig absolute inset-0 z-0 pointer-events-none"></div>
+  <div class="relative z-10 flex justify-center mb-6" id="plgScene"></div>
+  <div class="relative z-10 w-full max-w-2xl px-4">
+    <div class="bg-ink/93 border border-parchment/10 border-t-[3px] border-t-candle/55 px-8 py-5 relative">
+      <div id="plgSpk" class="font-title text-candle text-xs tracking-[0.35em] absolute -top-3 left-6 bg-ink px-2">ELIAS</div>
+      <div id="plgTxt" class="font-body text-parchment text-lg leading-relaxed min-h-[2.5rem]"></div>
+      <div id="plgDots" class="flex gap-2 mt-3"></div>
+    </div>
+    <button onclick="advancePrologue()" class="mt-2 w-full font-title text-candle/75 border border-candle/22 py-2 tracking-[0.3em] uppercase text-xs hover:bg-candle/8 hover:border-candle/55 hover:text-candle transition-all duration-200">&#9658; CONTINUE</button>
+  </div>
+</div>
+
+<div class="screen flex-row items-stretch" id="scrGame">
+  <div class="flex-1 relative overflow-hidden" id="wWrap">
+    <div id="rBg" class="absolute inset-0 z-0"></div>
+    <div id="rDeco" class="absolute inset-0 z-[1] pointer-events-none"></div>
+    <div id="objLayer" class="absolute inset-0 z-[2]"></div>
+    <div id="npcLayer" class="absolute inset-0 z-[3] pointer-events-none"></div>
+    <div id="player" class="absolute z-[10]" style="width:110px;height:220px;"><div id="pSprite"></div></div>
+    <div id="iRing" class="iring hidden z-[11]"></div>
+    <div class="vig absolute inset-0 z-[12] pointer-events-none"></div>
+    <div class="absolute top-0 inset-x-0 z-[13] flex items-center justify-between px-4 py-2 bg-gradient-to-b from-ink/75 to-transparent pointer-events-none">
+      <div><div id="hLvl" class="font-title text-candle/55 text-[0.58rem] tracking-[0.4em]">LEVEL 1</div><div id="hRoom" class="font-title text-parchment text-sm tracking-wide">THE LIVING ROOM</div></div>
+      <div class="flex items-center gap-2 font-pixel text-parchment/35 text-sm"><span class="kb">E</span><span>interact</span><span class="ml-1 kb">F</span><span>examine</span><span class="ml-1 kb px-1" style="width:auto">SPC</span><span>next</span></div>
+    </div>
+    <div id="pLabel" class="absolute z-[13] hidden pointer-events-none" style="transform:translateX(-50%);"><div class="font-pixel text-candle text-base bg-ink/85 border border-candle/35 px-2 py-0.5 whitespace-nowrap"></div></div>
+    <div id="dlgBox" class="absolute bottom-0 inset-x-0 z-[14] p-3">
+      <div class="bg-ink/96 border border-parchment/10 border-t-[3px] border-t-candle/55 px-6 py-4 relative">
+        <div id="dlgSpk" class="font-title text-candle text-xs tracking-[0.3em] absolute -top-3 left-5 bg-ink px-2"></div>
+        <div id="dlgTxt" class="font-body text-parchment text-base leading-relaxed min-h-[1.8rem]"></div>
+        <div class="absolute bottom-2 right-4 font-pixel text-candle/35 text-sm animate-p2">SPC / E ▼</div>
+      </div>
+    </div>
+  </div>
+  <div class="w-72 bg-[#12100e]/95 border-l border-parchment/8 flex flex-col overflow-hidden" style="min-width:255px;">
+    <div class="px-4 py-3 border-b border-candle/12 bg-candle/4">
+      <div id="pLvl" class="font-title text-candle/55 text-[0.58rem] tracking-[0.4em]">LEVEL 1</div>
+      <div id="pRoom" class="font-title text-parchment text-sm tracking-wide mt-0.5">THE LIVING ROOM</div>
+    </div>
+    <div id="storyLog" class="flex-1 overflow-y-auto px-4 py-3 scb space-y-3"></div>
+    <div id="puzzleArea" class="px-4 py-3 border-t border-parchment/8"></div>
+    <div class="px-4 py-3 border-t border-parchment/8">
+      <div class="font-title text-[0.52rem] tracking-[0.3em] text-parchment/22 mb-1.5">INVENTORY</div>
+      <div id="invItems" class="flex flex-wrap gap-1"></div>
+    </div>
+  </div>
+</div>
+
+<div class="screen flex-col items-center justify-center" id="scrEnding">
+  <div class="re absolute inset-0 z-0"></div>
+  <div class="vig absolute inset-0 z-0 pointer-events-none"></div>
+  <div id="endWrap" class="relative z-10 w-full max-w-xl px-8 overflow-y-auto max-h-screen py-10 scb text-center">
+    <div id="endTxt"></div>
+  </div>
+</div>
+
+<script>
+
+var A={
+  LOGO:"assets/remnantlogo-removebg-preview.png",
+  ELIAS_S:"ELIAS_S.png",
+  ANN_S:"ANN_S.png",
+  HERNANDO_S:"assets/HER_S.png",
+
+  ELIAS_N:"assets/ELIAS_N.png",
+  ELIAS_S:"assets/ELIAS_S.png",
+  ELIAS_E:"assets/ELIAS_E.png",
+  ELIAS_W:"assets/ELIAS_W.png",
+ 
+  ANN_N:"assets/ANN_N.png",
+  ANN_S:"assets/ANN_S.png",
+  ANN_E:"assets/ANN_E.png",
+  ANN_W:"aasets/ANN.W.png",
+
+  HER_N:"assets/HER_N.png",
+  HER_S:"assets/HER_S.png",
+  HER_E:"assets/HER_E.png",
+  HER_W:"assets/HER_W.png",
+
+  NP_7:"assets/NP_7.png",
+  NP_33:"assets/NP_33.png",
+  NP_30:"assets/NP_30.png",
+  C_VOID_LIT:"assets/C_VOID_LIT.png",
+  C_MOON_LIT:"assets/C_MOON_LIT.png",
+  C_EYE_LIT:"assets/C_EYE_LIT.png",
+  C_HAND_LIT:"assets/C_HAND_LIT.png",
+  C_FLAME_LIT:"assets/C_FLAME_LIT.png",
+  C_VOID_OUT:"assets/C_VOID_OUT.png",
+  C_MOON_OUT:"assets/C_MOON_OUT.png",
+  C_EYE_OUT:"assets/C_EYE_OUT.png",
+  C_HAND_OUT:"assets/C_HAND_OUT.png",
+  C_FLAME_OUT:"assets/C_FLAME_OUT.png",
+};
+function qs(id){return document.getElementById(id);}
+function ce(tag,cls,html){var el=document.createElement(tag);if(cls)el.className=cls;if(html)el.innerHTML=html;return el;}
+function showScreen(id){document.querySelectorAll('.screen').forEach(function(s){s.classList.remove('active');});qs(id).classList.add('active');}
+function rFlash(){var f=qs('rf');f.style.opacity='1';setTimeout(function(){f.style.opacity='0';},110);}
+
+function doTrans(txt,cb,ms){
+  ms=ms||1300;
+  qs('ttxt').textContent=txt;
+  qs('tov').classList.add('show');
+  setTimeout(function(){if(cb)cb();setTimeout(function(){qs('tov').classList.remove('show');},550);},ms);
+}
+var G={level:0,inv:[],flags:{},keys:{},px:400,py:300,pdir:'south',pmoving:false,pframe:0,pfT:0,paused:false,nearObj:null,dlgOpen:false,dlgCb:null,typeIv:null,plgIv:null};
+var objects=[], dlgQ=[], dlgActive=false;
+var papersFound=0, foundDrawings=[], boardState=[null,null,null,null,null], selCard=null;
+var wallsRead={}, candlesOut=[], pIdx=0;
+document.addEventListener('keydown',function(e){
+  var k=e.key.toLowerCase();
+  G.keys[k]=true;
+  if(k==='e'){handleInteract();}
+  if(k==='f'){handleExamine();}
+  if(k===' '||k==='enter'){e.preventDefault();if(G.dlgOpen)advanceDlg();}
+});
+document.addEventListener('keyup',function(e){G.keys[e.key.toLowerCase()]=false;});
+function dlg(lines,onDone){
+  dlgQ=[];
+  for(var i=0;i<lines.length;i++){
+    dlgQ.push({speaker:lines[i].speaker,text:lines[i].text,cb:i===lines.length-1?onDone:null});
+  }
+  dlgActive=false;
+  nextDlg();
+}
+function nextDlg(){
+  if(!dlgQ.length){closeDlg();dlgActive=false;return;}
+  dlgActive=true;G.paused=true;
+  var item=dlgQ.shift();
+  openDlgFrame(item.speaker,item.text);
+  logEntry(item.speaker,item.text);
+  G.dlgCb=item.cb||null;
+}
+function openDlgFrame(speaker,text){
+  qs('dlgSpk').textContent=speaker;
+  var el=qs('dlgTxt');el.textContent='';
+  qs('dlgBox').classList.add('open');
+  G.dlgOpen=true;
+  clearInterval(G.typeIv);
+  var i=0;
+  G.typeIv=setInterval(function(){if(i<text.length)el.textContent+=text[i++];else clearInterval(G.typeIv);},20);
+}
+function closeDlg(){qs('dlgBox').classList.remove('open');G.dlgOpen=false;G.paused=false;}
+function advanceDlg(){
+  if(!G.dlgOpen)return;
+  clearInterval(G.typeIv);
+  var cb=G.dlgCb;G.dlgCb=null;
+  if(dlgQ.length){nextDlg();if(cb)cb();}
+  else{closeDlg();dlgActive=false;if(cb)cb();}
+}
+function handleInteract(){if(G.dlgOpen){advanceDlg();return;}if(G.nearObj&&G.nearObj.onInteract)G.nearObj.onInteract();}
+function handleExamine(){if(G.dlgOpen)return;if(G.nearObj&&G.nearObj.onExamine)G.nearObj.onExamine();else if(G.nearObj&&G.nearObj.onInteract)G.nearObj.onInteract();}
+
+function logEntry(speaker,text){
+  var area=qs('storyLog');
+  var d=ce('div','animate-fadeUp');
+  var cols={ELIAS:'text-candle',HERNANDO:'text-pink-300/80',ANN:'text-emerald-300/80',UNKNOWN:'text-blue-300/70'};
+  if(speaker==='NARRATION'){
+    d.innerHTML='<p class="font-body italic text-xs leading-relaxed text-parchment/45 border-l border-candle/28 pl-2">'+text+'</p>';
+  } else {
+    var c=cols[speaker]||'text-candle';
+    d.innerHTML='<div class="font-title text-[0.62rem] tracking-[0.2em] '+c+' mb-0.5">'+speaker+'</div><p class="font-body text-sm leading-relaxed text-parchment/85">'+text+'</p>';
+  }
+  area.appendChild(d);
+  setTimeout(function(){area.scrollTop=area.scrollHeight;},35);
+}
+function clearLog(){qs('storyLog').innerHTML='';}
+
+function pBtn(lbl,fn){return '<button onclick="'+fn+'" class="w-full font-title text-candle border border-candle/28 py-1.5 text-[0.68rem] tracking-[0.18em] hover:bg-candle/10 hover:border-candle transition-all duration-200 mt-1">'+lbl+'</button>';}
+function pFb(id){id=id||'pfb';return '<div id="'+id+'" class="font-body italic text-xs min-h-[1rem] mt-1.5"></div>';}
+function setFb(id,txt,ok){var el=qs(id);if(!el)return;el.textContent=txt;el.className='font-body italic text-xs min-h-[1rem] mt-1.5 '+(ok?'text-emerald-400/80':'text-red-400/65');}
+function numIn(id){return '<input id="'+id+'" type="number" min="0" max="99" placeholder="?" class="w-12 bg-parchment/5 border border-parchment/18 text-parchment font-pixel text-center text-xl py-0.5 outline-none focus:border-candle transition-colors"/>';}
+function setPuzzle(html){qs('puzzleArea').innerHTML=html;}
+function clearPuzzle(){qs('puzzleArea').innerHTML='';}
+
+function addItem(name,icon,id){
+  if(G.inv.indexOf(id)>=0)return;G.inv.push(id);
+  var el=ce('div','bg-parchment/5 border border-parchment/12 px-1.5 py-0.5 font-title text-[0.52rem] tracking-wide text-parchment/52 hover:border-candle/40 hover:text-candle transition-all cursor-default relative');
+  el.textContent=icon+' '+name;
+  var dot=ce('span','absolute -top-1 -right-1 text-candle text-[9px]');dot.textContent='•';
+  el.appendChild(dot);qs('invItems').appendChild(el);
+  setTimeout(function(){dot.remove();},2800);
+}
+
+function clearObjects(){objects=[];qs('objLayer').innerHTML='';qs('npcLayer').innerHTML='';}
+function addObj(o){
+  objects.push(o);
+  if(o.hidden)return;
+  var layer=qs('objLayer');
+  var el=ce('div');
+  el.id='o_'+o.id;
+  el.style.cssText='position:absolute;left:'+o.x+'px;top:'+o.y+'px;width:'+o.w+'px;height:'+o.h+'px;cursor:pointer;';
+  if(o.html)el.innerHTML=o.html;
+  el.addEventListener('click',function(){if(dist(o)<115&&o.onInteract)o.onInteract();else logEntry('NARRATION','Too far — walk closer first.');});
+  layer.appendChild(el);
+}
+function dist(o){return Math.hypot(G.px-(o.x+o.w/2),G.py-(o.y+o.h/2));}
+function getNear(){var best=null,bd=88;for(var i=0;i<objects.length;i++){var o=objects[i];if(o.collected)continue;var d=dist(o);if(d<bd){bd=d;best=o;}}return best;}
+
+var walkFrames=[[0,0,0,0],[2,-3,-2,3],[3,-5,-3,5],[2,-3,-2,3]];
+function getDirKey(char,dir){
+  var map={
+    north:'N',south:'S',east:'E',west:'W',
+    northeast:'NE',northwest:'NW',southeast:'SE',southwest:'SW'
+  };
+  return char+'_'+(map[dir]||'S');
+}
+var _spriteCache={};
+function renderPlayer(){
+  var sp=qs('pSprite');
+  if(!sp)return;
+  var dir=G.pdir;
+  var key=getDirKey('ELIAS',dir);
+  var imgUrl=A[key]||A.ELIAS_S;
+  if(_spriteCache.elias===key&&!G.pmoving)return;
+  _spriteCache.elias=key;
+  sp.innerHTML='';
+  var img=document.createElement('img');
+  img.src=imgUrl;
+  img.style.cssText='height:220px;object-fit:contain;image-rendering:pixelated;filter:drop-shadow(0 6px 14px rgba(0,0,0,0.85));display:block;';
+  img.onerror=function(){
+    this.style.display='none';
+    sp.innerHTML=fallbackPlayerSVG(dir);
+  };
+  sp.appendChild(img);
+}
+function fallbackPlayerSVG(dir){
+  var wf=[0,0,0,0];
+  var eyeL='',eyeR='';
+  if(dir==='south'){eyeL='<rect x="10" y="11" width="2" height="2" fill="#1a1008"/>';eyeR='<rect x="16" y="11" width="2" height="2" fill="#1a1008"/>';}
+  else if(dir==='east'||dir==='west'){eyeL='<rect x="18" y="11" width="2" height="2" fill="#1a1008"/>';}
+  var hair=(dir==='north')?'<rect x="8" y="5" width="12" height="8" fill="#1a1008" rx="2"/>':'<rect x="8" y="5" width="12" height="4" fill="#1a1008" rx="2"/>';
+  var flip=(dir==='west')?'transform="scale(-1,1) translate(-28,0)"':'';
+  return '<svg width="110" height="220" viewBox="0 0 28 44" '+flip+' xmlns="http://www.w3.org/2000/svg">'
+    +'<ellipse cx="14" cy="42" rx="8" ry="2" fill="rgba(0,0,0,0.38)"/>'
+    +'<rect x="9" y="27" width="4" height="9" fill="#1e1a2a" rx="1"/>'
+    +'<rect x="15" y="27" width="4" height="9" fill="#1e1a2a" rx="1"/>'
+    +'<rect x="8" y="34" width="6" height="4" fill="#100d08" rx="1"/>'
+    +'<rect x="14" y="34" width="6" height="4" fill="#100d08" rx="1"/>'
+    +'<rect x="8" y="17" width="12" height="12" fill="#283040" rx="2"/>'
+    +'<rect x="4" y="18" width="4" height="8" fill="#283040" rx="1"/>'
+    +'<rect x="20" y="18" width="4" height="8" fill="#283040" rx="1"/>'
+    +'<rect x="4" y="25" width="4" height="3" fill="#c49060" rx="1"/>'
+    +'<rect x="20" y="25" width="4" height="3" fill="#c49060" rx="1"/>'
+    +'<rect x="12" y="14" width="4" height="4" fill="#c49060"/>'
+    +'<rect x="8" y="5" width="12" height="11" fill="#c49060" rx="2"/>'
+    +hair+eyeL+eyeR+'</svg>';
+}
+
+var NPC_IMGS={hernando:A.HER_S,ann:A.ANN_S,elias:A.ELIAS_S,ghost:A.GHOST_S,hernando2:A.HER_S};
+function npcHTML(shirt,label,imgKey){
+  return fallbackNPC(shirt,label,imgKey);
+}
+function fallbackNPC(shirt,label){
+  return '<div style="text-align:center;"><div style="font-family:\'VT323\',monospace;font-size:12px;color:rgba(200,147,58,0.65);margin-bottom:1px;white-space:nowrap;">'+label+'</div>'
+    +'<svg width="80" height="160" viewBox="0 0 28 44">'
+    +'<ellipse cx="14" cy="42" rx="7" ry="2" fill="rgba(0,0,0,0.32)"/>'
+    +'<rect x="9" y="27" width="4" height="9" fill="#1e1a2a" rx="1"/>'
+    +'<rect x="15" y="27" width="4" height="9" fill="#1e1a2a" rx="1"/>'
+    +'<rect x="8" y="35" width="6" height="4" fill="#100d08" rx="1"/>'
+    +'<rect x="14" y="35" width="6" height="4" fill="#100d08" rx="1"/>'
+    +'<rect x="8" y="17" width="12" height="12" fill="'+shirt+'" rx="2"/>'
+    +'<rect x="4" y="18" width="4" height="8" fill="'+shirt+'" rx="1"/>'
+    +'<rect x="20" y="18" width="4" height="8" fill="'+shirt+'" rx="1"/>'
+    +'<rect x="4" y="25" width="4" height="3" fill="#c49060" rx="1"/>'
+    +'<rect x="20" y="25" width="4" height="3" fill="#c49060" rx="1"/>'
+    +'<rect x="12" y="14" width="4" height="4" fill="#c49060"/>'
+    +'<rect x="8" y="5" width="12" height="11" fill="#c49060" rx="2"/>'
+    +'<rect x="8" y="5" width="12" height="4" fill="'+shirt+'" rx="2"/>'
+    +'<rect x="10" y="11" width="2" height="2" fill="#1a1008"/>'
+    +'<rect x="16" y="11" width="2" height="2" fill="#1a1008"/>'
+    +'</svg></div>';
+}
+function addNPC(id,x,y,shirt,label,imgKey){
+  var el=ce('div');el.id='npc_'+id;
+  el.style.cssText='position:absolute;left:'+(x-40)+'px;top:'+(y-160)+'px;';
+  el.innerHTML=fallbackNPC(shirt,label);
+  qs('npcLayer').appendChild(el);
+  // overlay real image if available
+  if(imgKey&&NPC_IMGS[imgKey]){
+    var wrap=el.querySelector('div')||el;
+    var imgEl=document.createElement('img');
+    imgEl.src=NPC_IMGS[imgKey];
+    imgEl.style.cssText='height:160px;object-fit:contain;filter:drop-shadow(0 6px 14px rgba(0,0,0,0.85));display:block;margin:0 auto;image-rendering:pixelated;';
+    imgEl.onerror=function(){this.style.display='none';};
+
+    var svg=el.querySelector('svg');
+    if(svg)svg.parentNode.insertBefore(imgEl,svg);
+    else el.insertBefore(imgEl,el.firstChild);
+  }
+}
+var SPEED=2.6;
+function ww(){return qs('wWrap').clientWidth;}
+function wh(){return qs('wWrap').clientHeight;}
+var lastT=0;
+function loop(ts){
+  var dt=Math.min(ts-lastT,48);lastT=ts;
+  if(G.level>0&&!G.paused){
+    var dx=0,dy=0;
+    var up=G.keys['w']||G.keys['arrowup'];
+    var dn=G.keys['s']||G.keys['arrowdown'];
+    var lt=G.keys['a']||G.keys['arrowleft'];
+    var rt=G.keys['d']||G.keys['arrowright'];
+    if(up){dy=-SPEED;}
+    if(dn){dy=SPEED;}
+    if(lt){dx=-SPEED;}
+    if(rt){dx=SPEED;}
+   
+    if(up&&rt)G.pdir='northeast';
+    else if(up&&lt)G.pdir='northwest';
+    else if(dn&&rt)G.pdir='southeast';
+    else if(dn&&lt)G.pdir='southwest';
+    else if(up)G.pdir='north';
+    else if(dn)G.pdir='south';
+    else if(lt)G.pdir='west';
+    else if(rt)G.pdir='east';
+    G.pmoving=(dx!==0||dy!==0);
+    if(G.pmoving){
+      var minY=wh()*0.28,maxY=wh()*0.87;
+      G.px=Math.max(18,Math.min(ww()-18,G.px+dx));
+      G.py=Math.max(minY,Math.min(maxY,G.py+dy));
+      G.pfT+=dt;if(G.pfT>115){G.pframe=(G.pframe+1)%4;G.pfT=0;}
+    }
+    var pl=qs('player');
+    pl.style.left=(G.px-55)+'px';pl.style.top=(G.py-220)+'px';
+    pl.style.zIndex=Math.floor(G.py);
+    renderPlayer();
+    G.nearObj=getNear();
+    updateHint();
+  }
+  requestAnimationFrame(loop);
+}
+requestAnimationFrame(function(t){lastT=t;loop(t);});
+
+function updateHint(){
+  var ring=qs('iRing'),lbl=qs('pLabel');
+  if(G.nearObj){
+    var cx=G.nearObj.x+G.nearObj.w/2,cy=G.nearObj.y;
+    ring.style.left=cx+'px';ring.style.top=cy+'px';ring.classList.remove('hidden');
+    lbl.style.left=cx+'px';lbl.style.top=(cy-30)+'px';lbl.classList.remove('hidden');
+    lbl.querySelector('div').textContent='[E] '+G.nearObj.label;
+  } else {ring.classList.add('hidden');lbl.classList.add('hidden');}
+}
+
+function setBgImg(url,opacity){
+  opacity=opacity||0.55;
+  var b=qs("rBg");
+  var img=document.createElement('img');
+  img.src=url;
+  img.style.cssText='width:100%;height:100%;object-fit:cover;opacity:'+opacity+';position:absolute;inset:0;';
+  img.onerror=function(){this.style.display='none';};
+  b.innerHTML='';
+  b.appendChild(img);
+}
+function setRoom(bgCls,lvl,room){
+  qs('rBg').className='absolute inset-0 z-0 '+bgCls;qs('rBg').style.position='relative';
+  qs('hLvl').textContent=lvl;qs('pLvl').textContent=lvl;
+  qs('hRoom').textContent=room;qs('pRoom').textContent=room;
+  qs('rDeco').innerHTML='';clearObjects();clearPuzzle();
+}
+function setDeco(svg){qs('rDeco').innerHTML='<svg class="w-full h-full" viewBox="0 0 900 600" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">'+svg+'</svg>';}
+
+var PROLOGUE=[
+  {spk:'ELIAS',txt:"Papa always locked this door. Always."},
+  {spk:'NARRATION',txt:"He steps inside. The smell hits him — burnt wax and rot."},
+  {spk:'ELIAS',txt:"What happened here..."},
+  {spk:'ELIAS',txt:"Ann has been gone for three years. That's not possible."},
+  {spk:'NARRATION',txt:"He looks around the dark house."},
+  {spk:'ELIAS',txt:"Papa. What did you do?!"},
+];
+function startPrologue(){
+  showScreen('scrPrologue');
+  qs('plgScene').innerHTML='<div style="position:relative;display:inline-block;">'
+    +'<div style="width:78px;height:128px;background:#1a1208;border:3px solid #2a2015;border-bottom:none;position:relative;">'
+    +'<div style="position:absolute;inset:5px;background:rgba(200,147,58,0.05);"></div>'
+    +'<div style="position:absolute;inset:0;background:radial-gradient(ellipse at 50% 100%,rgba(200,147,58,0.18) 0%,transparent 70%);"></div>'
+    +'</div>'
+    +'<div id="plgChar" style="position:absolute;bottom:-6px;left:50%;transform:translateX(-50%);min-height:44px;"></div>'
+    +'</div>';
+  
+  var plgChar=qs('plgChar');
+  if(plgChar&&A.ELIAS_S){
+    var eImg=document.createElement('img');
+    eImg.src=A.ELIAS_S;
+    eImg.style.cssText='height:260px;object-fit:contain;filter:drop-shadow(0 6px 16px rgba(0,0,0,0.9));image-rendering:pixelated;';
+    eImg.onerror=function(){this.style.display='none';};
+    plgChar.insertBefore(eImg,plgChar.firstChild);
+  }
+  var dots=qs('plgDots');dots.innerHTML='';
+  for(var i=0;i<PROLOGUE.length;i++){
+    var d=ce('div','w-1.5 h-1.5 rounded-full transition-colors duration-300 '+(i===0?'bg-candle':'bg-parchment/18'));
+    d.id='pd'+i;dots.appendChild(d);
+  }
+  pIdx=0;typePrologue();
+}
+function typePrologue(){
+  var l=PROLOGUE[pIdx];
+  qs('plgSpk').textContent=l.spk;
+  var el=qs('plgTxt');el.textContent='';
+  clearInterval(G.plgIv);var i=0;
+  G.plgIv=setInterval(function(){if(i<l.txt.length)el.textContent+=l.txt[i++];else clearInterval(G.plgIv);},22);
+}
+function advancePrologue(){
+  pIdx++;
+  if(pIdx>=PROLOGUE.length){doTrans('ENTERING THE HOUSE...',function(){startLevel(1);});return;}
+  for(var i=0;i<PROLOGUE.length;i++){var d=qs('pd'+i);if(d)d.className='w-1.5 h-1.5 rounded-full transition-colors duration-300 '+(i<=pIdx?'bg-candle':'bg-parchment/18');}
+  typePrologue();
+}
+
+
+function startLevel1(){
+  G.level=1;showScreen('scrGame');clearLog();
+  G.px=ww()*0.5;G.py=wh()*0.72;
+  setRoom('rl','LEVEL 1','THE LIVING ROOM');setBgImg(A.BG_LIVINGROOM,0.5);
+  setDeco(
+    '<rect x="0" y="415" width="900" height="185" fill="#1a1208"/>'
+    +'<rect x="0" y="0" width="900" height="420" fill="#201810"/>'
+    +'<rect x="0" y="378" width="900" height="6" fill="rgba(200,147,58,0.1)"/>'
+    +'<rect x="55" y="70" width="115" height="148" fill="#1e1610" stroke="rgba(200,180,150,0.18)" stroke-width="2"/>'
+    +'<rect x="65" y="80" width="95" height="128" fill="#2a2018"/>'
+    +'<ellipse cx="112" cy="130" rx="26" ry="30" fill="#201810"/>'
+    +'<path d="M86 110 Q112 100 138 110 Q138 145 112 155 Q86 145 86 110" fill="#201810"/>'
+    +'<rect x="104" y="172" width="17" height="26" fill="#3a2e1e" rx="1"/><circle cx="112" cy="168" r="7" fill="#3a2e1e"/>'
+    +'<rect x="170" y="285" width="210" height="95" fill="#2a1e12" rx="5" transform="rotate(-5,275,332)"/>'
+    +'<rect x="175" y="278" width="210" height="32" fill="#3a2a18" rx="3" transform="rotate(-5,280,294)"/>'
+    +'<rect x="680" y="95" width="82" height="285" fill="#1e1408" rx="4" stroke="rgba(200,180,150,0.14)" stroke-width="1"/>'
+    +'<rect x="688" y="106" width="66" height="95" fill="#140e06" rx="2"/>'
+    +'<circle cx="721" cy="153" r="30" fill="#1a1006" stroke="rgba(200,180,150,0.2)" stroke-width="1"/>'
+    +'<line x1="721" y1="153" x2="721" y2="130" stroke="rgba(200,180,150,0.7)" stroke-width="2.5"/>'
+    +'<line x1="721" y1="153" x2="700" y2="158" stroke="rgba(200,180,150,0.5)" stroke-width="2"/>'
+    +'<line x1="721" y1="218" x2="721" y2="330" stroke="rgba(200,180,150,0.15)" stroke-width="1"/>'
+    +'<circle cx="721" cy="342" r="19" fill="#1e1808" stroke="rgba(200,147,58,0.18)" stroke-width="1"/>'
+    +'<rect x="270" y="388" width="82" height="57" fill="#2a2318" rx="1" transform="rotate(5,311,416)"/>'
+    +'<rect x="372" y="398" width="72" height="52" fill="#2a2318" rx="1" transform="rotate(-7,408,424)"/>'
+    +'<rect x="468" y="382" width="78" height="54" fill="#2a2318" rx="1" transform="rotate(4,507,409)"/>'
+    +'<circle cx="304" cy="415" r="15" fill="rgba(107,26,26,0.28)" stroke="#6b1a1a" stroke-width="2"/>'
+    +'<text x="304" y="420" text-anchor="middle" fill="#a03030" font-size="13" font-family="monospace">7</text>'
+    +'<circle cx="408" cy="422" r="15" fill="rgba(107,26,26,0.28)" stroke="#6b1a1a" stroke-width="2"/>'
+    +'<text x="408" y="427" text-anchor="middle" fill="#a03030" font-size="11" font-family="monospace">33</text>'
+    +'<circle cx="508" cy="406" r="15" fill="rgba(107,26,26,0.28)" stroke="#6b1a1a" stroke-width="2"/>'
+    +'<text x="508" y="411" text-anchor="middle" fill="#a03030" font-size="11" font-family="monospace">30</text>'
+    +'<rect x="635" y="368" width="9" height="30" fill="#3a2e1e" rx="1"/>'
+    +'<ellipse cx="639" cy="358" rx="11" ry="14" fill="rgba(200,147,58,0.45)" style="filter:blur(3px)"/>'
+    +'<ellipse cx="639" cy="354" rx="5" ry="6" fill="rgba(255,220,80,0.85)"/>'
+  );
+ 
+  setTimeout(function(){
+    var W2=ww(),H2=wh(),s2=W2/900,t2=H2/600;
+    var nps=[
+      {url:A.NP_7,  x:265*s2, y:378*t2, rot:5,  w:90*s2},
+      {url:A.NP_33, x:365*s2, y:390*t2, rot:-7, w:85*s2},
+      {url:A.NP_30, x:460*s2, y:374*t2, rot:4,  w:85*s2},
+    ];
+    nps.forEach(function(np,i){
+      var el=qs('o_p'+(i+1));
+      if(!el)return;
+      var img=document.createElement('img');
+      img.src=np.url;
+      img.style.cssText='position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover;border-radius:2px;opacity:0.92;pointer-events:none;';
+      img.onerror=function(){this.remove();};
+      el.insertBefore(img,el.firstChild);
+    });
+  },150);
+  var W=ww(),H=wh(),s=W/900,t=H/600;
+  addObj({id:'p1',x:265*s,y:378*t,w:95*s,h:65*t,label:'Newspaper (7)',html:'',
+    onInteract:function(){collectPaper('p1',7);},
+    onExamine:function(){dlg([{speaker:'ELIAS',text:'A newspaper. The number 7 circled in red ink.'}]);}});
+  addObj({id:'p2',x:365*s,y:390*t,w:88*s,h:62*t,label:'Newspaper (33)',html:'',
+    onInteract:function(){collectPaper('p2',33);},
+    onExamine:function(){dlg([{speaker:'ELIAS',text:'Another paper. 33 circled in red.'}]);}});
+  addObj({id:'p3',x:460*s,y:374*t,w:88*s,h:62*t,label:'Newspaper (30)',html:'',
+    onInteract:function(){collectPaper('p3',30);},
+    onExamine:function(){dlg([{speaker:'ELIAS',text:'The last paper. 30. Three numbers — a code.'}]);}});
+  addObj({id:'clock',x:680*s,y:95*t,w:85*s,h:280*t,label:'Grandfather Clock',html:'',
+    onInteract:function(){if(!G.flags.papersGot)dlg([{speaker:'ELIAS',text:"Ticking backwards. I need to understand what that means."}]);else revealClockPuzzle();},
+    onExamine:function(){dlg([{speaker:'ELIAS',text:"Counter-clockwise. 7. 33. 30. These numbers match."}]);}});
+  addObj({id:'photo',x:50*s,y:65*t,w:125*s,h:155*t,label:'Family Photo',html:'',
+    onInteract:function(){dlg([{speaker:'NARRATION',text:"Ann's face torn clean out of the family photo."},{speaker:'ELIAS',text:"He couldn't bear to look at her."}]);},
+    onExamine:function(){dlg([{speaker:'ELIAS',text:"Just Papa and me. Ann's outline where she used to be."}]);}});
+  dlg([
+    {speaker:'NARRATION',text:'The living room is destroyed. Newspapers scattered everywhere.'},
+    {speaker:'ELIAS',text:'He tore out her face.'},
+    {speaker:'NARRATION',text:'The grandfather clock ticks — backwards.'},
+    {speaker:'NARRATION',text:'Collect all three newspapers. Walk close and press E.'},
+  ]);
+}
+function collectPaper(id,num){
+  var o=null;for(var i=0;i<objects.length;i++){if(objects[i].id===id){o=objects[i];break;}}
+  if(!o||o.collected)return;
+  o.collected=true;var el=qs('o_'+id);if(el)el.style.opacity='0.15';
+  papersFound++;
+  if(papersFound===1)dlg([{speaker:'ELIAS',text:'These numbers. Papa left them here on purpose.'}]);
+  else if(papersFound===2)dlg([{speaker:'NARRATION',text:'Another number in red ink...'}]);
+  else if(papersFound>=3){
+    addItem('Newspapers','📰','papers');G.flags.papersGot=true;
+    dlg([{speaker:'ELIAS',text:'7. 33. 30. The clock. Of course.'},{speaker:'NARRATION',text:'Walk to the grandfather clock and press E.'}]);
+  }
+}
+function revealClockPuzzle(){
+  if(G.flags.clockSolved)return;
+  setPuzzle('<div class="font-title text-candle/52 text-[0.58rem] tracking-[0.3em] uppercase mb-1.5">GRANDFATHER CLOCK</div>'
+    +'<p class="font-body italic text-parchment/38 text-xs mb-2">Enter the three numbers from the newspapers.</p>'
+    +'<div class="flex items-center gap-1.5 mb-2">'+numIn('c1')+'<span class="font-pixel text-candle/38 text-lg">·</span>'+numIn('c2')+'<span class="font-pixel text-candle/38 text-lg">·</span>'+numIn('c3')+'</div>'
+    +pBtn('SET THE CLOCK','checkClock()')+pFb('cfb'));
+}
+function checkClock(){
+  var v1=parseInt(qs('c1').value),v2=parseInt(qs('c2').value),v3=parseInt(qs('c3').value);
+  if(v1===7&&v2===33&&v3===30){
+    G.flags.clockSolved=true;setFb('cfb','Click. The drawer opens...',true);
+    addItem('Basement Key','🗝️','bkey');addItem('Torn Photo','🖼️','photo');clearPuzzle();
+    dlg([
+      {speaker:'ELIAS',text:"There's something inside."},
+      {speaker:'NARRATION',text:"A basement key. And a torn photo of Ann — her face intact, kept safe."},
+      {speaker:'ELIAS',text:"(reading) \"Don't go down there. Promise me.\""},
+      {speaker:'ELIAS',text:"What were you scared of, Ann."},
+      {speaker:'NARRATION',text:"Footsteps from upstairs. Someone's up there."},
+    ],function(){setPuzzle(pBtn("&#9658; GO TO ANN'S ROOM",'startLevel(2)'));});
+  } else {setFb('cfb','Nothing happens. The clock resets...',false);rFlash();setTimeout(function(){startLevel(1);},1200);}
+}
+
+var DRAWINGS=[
+  {id:'dr1',label:'Dark Door',emoji:'🚪',order:1,desc:'A door, drawn dozens of times. Always dark. Always locked.'},
+  {id:'dr2',label:'Glowing Circle',emoji:'⭕',order:2,desc:'A circle of light. Like a sun but underground.'},
+  {id:'dr3',label:'Robed Figure',emoji:'👘',order:3,desc:'A tall figure in dark robes. No face.'},
+  {id:'dr4',label:'Girl Alone',emoji:'👧',order:4,desc:'A small girl alone in the dark. This must be Ann.'},
+  {id:'dr5',label:'Small Light',emoji:'✨',order:5,desc:'Just a dot of light. The smallest drawing. Hope, maybe.'},
+];
+var DRAWPOS=[
+  {id:'dr1',ox:0.07,oy:0.56},{id:'dr2',ox:0.22,oy:0.70},{id:'dr3',ox:0.64,oy:0.60},
+  {id:'dr4',ox:0.80,oy:0.46},{id:'dr5',ox:0.13,oy:0.48},
+];
+function startLevel2(){
+  G.level=2;showScreen('scrGame');clearLog();
+  foundDrawings=[];boardState=[null,null,null,null,null];selCard=null;
+  G.px=ww()*0.45;G.py=wh()*0.65;
+  setRoom('ra','LEVEL 2',"ANN'S ROOM");setBgImg(A.BG_ABANDONED,0.35);
+  setDeco(
+    '<rect x="0" y="415" width="900" height="185" fill="#0d0b18"/>'
+    +'<rect x="0" y="0" width="900" height="420" fill="#0f0c1c"/>'
+    +'<rect x="28" y="275" width="172" height="125" fill="#1a1528" rx="4"/>'
+    +'<rect x="28" y="275" width="172" height="30" fill="#221e38" rx="3"/>'
+    +'<circle cx="98" cy="322" r="15" fill="#28203e"/><circle cx="90" cy="313" r="9" fill="#28203e"/>'
+    +'<rect x="618" y="295" width="205" height="105" fill="#1e1828" rx="3"/>'
+    +'<rect x="618" y="290" width="205" height="10" fill="#26203a" rx="2"/>'
+    +'<rect x="628" y="306" width="42" height="58" fill="#28233a"/><rect x="678" y="306" width="42" height="58" fill="#28233a"/>'
+    +'<rect x="738" y="96" width="92" height="135" fill="#181428" stroke="rgba(200,180,220,0.13)" stroke-width="2" rx="2"/>'
+    +'<rect x="744" y="102" width="80" height="123" fill="#0f0c1c" rx="1"/>'
+    +'<rect x="18" y="96" width="102" height="185" fill="#1a1528" stroke="rgba(200,180,220,0.07)" stroke-width="1"/>'
+    +'<line x1="69" y1="96" x2="69" y2="281" stroke="rgba(200,180,220,0.05)" stroke-width="1"/>'
+    +'<rect x="215" y="74" width="58" height="80" fill="none" stroke="#4a3858" stroke-width="2" rx="1"/>'
+    +'<rect x="295" y="78" width="58" height="78" fill="none" stroke="#4a3858" stroke-width="2" rx="1"/>'
+    +'<rect x="375" y="76" width="58" height="79" fill="none" stroke="#4a3858" stroke-width="2" rx="1"/>'
+    +'<circle cx="244" cy="114" r="20" fill="none" stroke="rgba(200,147,58,0.28)" stroke-width="2"/>'
+    +'<circle cx="324" cy="117" r="17" fill="none" stroke="rgba(200,147,58,0.20)" stroke-width="2"/>'
+    +'<circle cx="404" cy="115" r="19" fill="none" stroke="rgba(200,147,58,0.20)" stroke-width="2"/>'
+    +'<path d="M488 84 Q496 72 504 84 L522 138 Q496 147 470 138 Z" fill="rgba(75,55,100,0.48)"/>'
+    +'<rect x="455" y="74" width="205" height="125" fill="#1e1828" stroke="rgba(200,147,58,0.18)" stroke-width="1" rx="2"/>'
+    +'<text x="557" y="108" text-anchor="middle" fill="rgba(200,147,58,0.22)" font-size="10" font-family="Special Elite,cursive" letter-spacing="2">DRAWING BOARD</text>'
+  );
+  for(var p=0;p<DRAWPOS.length;p++){
+    (function(dp){
+      var dr=null;for(var i=0;i<DRAWINGS.length;i++){if(DRAWINGS[i].id===dp.id){dr=DRAWINGS[i];break;}}
+      addObj({id:dp.id,x:dp.ox*ww(),y:dp.oy*wh(),w:38,h:38,
+        label:'Find drawing ('+dr.label+')',
+        html:'<div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:1.4rem;background:rgba(200,147,58,0.04);border:1px dashed rgba(200,147,58,0.18);border-radius:4px;cursor:pointer;">'+dr.emoji+'</div>',
+        onInteract:function(){collectDrawing(dp.id);},
+        onExamine:function(){dlg([{speaker:'ELIAS',text:dr.desc}]);}});
+    })(DRAWPOS[p]);
+  }
+  dlg([
+    {speaker:'NARRATION',text:"Elias pushes the door open. Frozen in time — toys, crayons, dust. Every wall covered in drawings."},
+    {speaker:'ELIAS',text:'She kept drawing the same things.'},
+    {speaker:'UNKNOWN',text:"(Ann's voice) I left them for you. I knew you'd come back."},
+    {speaker:'ELIAS',text:'Ann?'},
+    {speaker:'NARRATION',text:'Nothing. Find all five drawings. Walk to each emoji and press E.'},
+  ]);
+  buildDrawPuzzle();
+}
+function collectDrawing(id){
+  for(var i=0;i<foundDrawings.length;i++){if(foundDrawings[i]===id){logEntry('NARRATION','Already found this one.');return;}}
+  foundDrawings.push(id);
+  var o=null;for(var i=0;i<objects.length;i++){if(objects[i].id===id){o=objects[i];break;}}
+  if(o){o.collected=true;var el=qs('o_'+id);if(el)el.style.opacity='0.18';}
+  var dr=null;for(var i=0;i<DRAWINGS.length;i++){if(DRAWINGS[i].id===id){dr=DRAWINGS[i];break;}}
+  logEntry('ELIAS','Found: '+dr.emoji+' '+dr.label+'.');
+  if(id==='dr5')dlg([{speaker:'ELIAS',text:'(picking up the last one) Ann alone. In the dark.'}]);
+  refreshHand();
+  if(foundDrawings.length===5)logEntry('NARRATION','All found. Pin them to the board in order.');
+}
+function buildDrawPuzzle(){
+  var slots='';
+  for(var i=0;i<5;i++)slots+='<div id="ds'+i+'" onclick="pinSlot('+i+')" class="aspect-square border border-dashed border-parchment/12 flex items-center justify-center text-xs cursor-pointer hover:border-candle/38 transition-colors text-parchment/22">'+(i+1)+'</div>';
+  setPuzzle('<div class="font-title text-candle/52 text-[0.58rem] tracking-[0.3em] uppercase mb-1">ANN\'S DRAWINGS</div>'
+    +'<div class="font-title text-candle/30 text-[0.52rem] tracking-widest mb-1">BOARD — PIN IN ORDER:</div>'
+    +'<div class="grid grid-cols-5 gap-1 mb-1.5" id="dBrd">'+slots+'</div>'
+    +'<div class="font-title text-candle/30 text-[0.52rem] tracking-widest mb-1">FOUND:</div>'
+    +'<div id="dHand" class="flex flex-wrap gap-1 mb-1 min-h-[22px]"><span class="font-body italic text-[0.62rem] text-parchment/22">Explore the room...</span></div>'
+    +pFb('dfb'));
+}
+function refreshHand(){
+  var h=qs('dHand');if(!h)return;
+  var html='';
+  for(var i=0;i<foundDrawings.length;i++){
+    var id=foundDrawings[i];
+    var d=null;for(var j=0;j<DRAWINGS.length;j++){if(DRAWINGS[j].id===id){d=DRAWINGS[j];break;}}
+    var used=(boardState.indexOf(id)>=0);var sel=(selCard===id);
+    var cls=used?'opacity-25 pointer-events-none border-parchment/7 text-parchment/25':sel?'border-candle bg-candle/18 text-candle':'border-parchment/12 text-parchment/48 hover:border-candle/38 hover:text-candle';
+    html+='<div onclick="selDraw(\''+id+'\')" class="px-1.5 py-0.5 font-title text-[0.52rem] border cursor-pointer transition-all duration-200 '+cls+'">'+d.emoji+' '+d.label+'</div>';
+  }
+  h.innerHTML=html;
+}
+function selDraw(id){if(boardState.indexOf(id)>=0)return;selCard=id;refreshHand();setFb('dfb','Click a board slot to pin it.',true);}
+function pinSlot(i){
+  if(!selCard){setFb('dfb','Select a drawing first.',false);return;}
+  var prev=boardState.indexOf(selCard);if(prev>=0)boardState[prev]=null;
+  boardState[i]=selCard;selCard=null;refreshBoard();refreshHand();
+  var full=true;for(var j=0;j<5;j++){if(!boardState[j]){full=false;break;}}
+  if(full)checkBoard();
+}
+function refreshBoard(){
+  for(var i=0;i<5;i++){
+    var sl=qs('ds'+i);if(!sl)continue;
+    var id=boardState[i];
+    if(id){var d=null;for(var j=0;j<DRAWINGS.length;j++){if(DRAWINGS[j].id===id){d=DRAWINGS[j];break;}}sl.innerHTML='<span class="text-base">'+d.emoji+'</span>';sl.className='aspect-square border border-candle/28 bg-candle/5 flex items-center justify-center cursor-pointer transition-colors';}
+    else{sl.innerHTML=String(i+1);sl.className='aspect-square border border-dashed border-parchment/12 flex items-center justify-center text-xs cursor-pointer hover:border-candle/38 transition-colors text-parchment/22';}
+  }
+}
+function checkBoard(){
+  var ok=true;
+  for(var i=0;i<5;i++){var d=null;for(var j=0;j<DRAWINGS.length;j++){if(DRAWINGS[j].id===boardState[i]){d=DRAWINGS[j];break;}}if(!d||d.order!==i+1){ok=false;break;}}
+  if(ok){
+    for(var i=0;i<5;i++){var s=qs('ds'+i);if(s)s.classList.add('animate-glow');}
+    setFb('dfb','The drawings glow. Hidden words appear...',true);
+    addItem('Code: 0303','🔢','code');
+    dlg([
+      {speaker:'ELIAS',text:'(reading across all five) "The code is zero three."'},
+      {speaker:'ELIAS',text:"0303. March 3rd. The Collapse. The worst day we ever had."},
+      {speaker:'ELIAS',text:"I'm sorry Ann. I have to find him."},
+    ],function(){
+      var codeInputs='';
+      for(var i=1;i<=4;i++)codeInputs+='<input id="k'+i+'" maxlength="1" type="text" placeholder="0" class="w-10 h-11 bg-parchment/5 border border-parchment/18 text-parchment font-pixel text-2xl text-center outline-none focus:border-candle transition-colors"/>';
+      setPuzzle('<div class="font-title text-candle/52 text-[0.58rem] tracking-[0.3em] uppercase mb-1.5">BASEMENT DOOR</div>'
+        +'<div class="flex gap-1 mb-2">'+codeInputs+'</div>'
+        +pBtn('ENTER CODE','checkCode()')+pFb('kfb'));
+      for(var i=1;i<=4;i++){
+        (function(n){
+          var el=qs('k'+n);if(!el)return;
+          el.addEventListener('input',function(){if(this.value.length===1&&n<4)qs('k'+(n+1)).focus();});
+        })(i);
+      }
+    });
+  } else {setFb('dfb','The drawings fade. Something is wrong...',false);rFlash();setTimeout(function(){startLevel(2);},1200);}
+}
+function checkCode(){
+  var code='';for(var i=1;i<=4;i++){var el=qs('k'+i);code+=el?el.value:'';}
+  if(code==='0303'){setFb('kfb','Cold air rushes up. The door opens.',true);dlg([{speaker:'ELIAS',text:"Papa. I'm coming."}],function(){doTrans('LEVEL 3 — THE BASEMENT',startLevel3);});}
+  else{setFb('kfb','Wrong code. The door stays shut...',false);rFlash();setTimeout(function(){startLevel(2);},1200);}
+}
+
+var WALLS=[
+  {day:'Day 3',text:'"I found her shoe under the stairs. Just one. I put it on the table so I wouldn\'t forget where I found it. I don\'t know why that matters. It just does."',reply:'(stopping) He was writing on the walls.'},
+  {day:'Day 9',text:'"Elias still hasn\'t called. I keep picking up the phone to call him. I don\'t know what I would say. I put the phone down every time."',reply:'(quietly) Papa...'},
+  {day:'Day 17',text:'"I forgot what her laugh sounds like today. I tried to remember it for an hour. I couldn\'t. I think that was the worst day so far."',reply:'He was alone down here when that happened. Nobody was with him.'},
+  {day:'Day 34',text:'"I forgot her birthday. The Remnants took that memory. I let them take it. I thought it was worth it. I don\'t think it was worth it."',reply:"He gave them his memories of her to get her back... and he still couldn't stop himself."},
+  {day:'Day 71',text:'"I can\'t see her face anymore. I gave all of it. I just want my daughter back... If Elias finds this — I\'m sorry I didn\'t call. I\'m sorry, son."',reply:'(voice breaking) He wrote this to me. He knew I would come.'},
+];
+function startLevel3(){
+  G.level=3;showScreen('scrGame');clearLog();wallsRead={};
+  G.px=ww()*0.1;G.py=wh()*0.72;
+  setRoom('rb','LEVEL 3','THE BASEMENT');setBgImg(A.BG_OLDHOUSE,0.2);
+  setDeco(
+    '<polygon points="0,600 900,600 680,255 220,255" fill="#0a0806"/>'
+    +'<polygon points="220,255 680,255 545,115 355,115" fill="#0c0908"/>'
+    +'<polygon points="0,600 220,255 220,0 0,0" fill="#080604"/>'
+    +'<polygon points="900,600 680,255 680,0 900,0" fill="#080604"/>'
+    +'<polygon points="415,0 220,340 680,340" fill="rgba(255,245,210,0.022)"/>'
+    +'<rect x="365" y="117" width="170" height="132" fill="#1a1006" stroke="rgba(200,147,58,0.18)" stroke-width="1"/>'
+    +'<rect x="372" y="124" width="156" height="120" fill="#130d04"/>'
+    +'<rect x="365" y="245" width="170" height="4" fill="rgba(200,147,58,0.32)" style="filter:blur(3px)"/>'
+    +'<text x="18" y="138" fill="rgba(180,160,130,0.32)" font-family="Courier Prime,monospace" font-size="9">Day 3.</text>'
+    +'<text x="18" y="152" fill="rgba(180,160,130,0.22)" font-family="Courier Prime,monospace" font-size="8">I found her shoe...</text>'
+    +'<text x="18" y="238" fill="rgba(180,160,130,0.32)" font-family="Courier Prime,monospace" font-size="9">Day 17.</text>'
+    +'<text x="18" y="252" fill="rgba(180,160,130,0.22)" font-family="Courier Prime,monospace" font-size="8">I forgot her laugh...</text>'
+    +'<text x="715" y="158" fill="rgba(180,160,130,0.32)" font-family="Courier Prime,monospace" font-size="9">Day 34.</text>'
+    +'<rect x="435" y="448" width="8" height="20" fill="#3a2e1e" rx="1"/>'
+    +'<ellipse cx="439" cy="442" rx="10" ry="12" fill="rgba(200,147,58,0.38)" style="filter:blur(4px)"/>'
+  );
+  var WPOS=[{ox:0.06,oy:0.42},{ox:0.14,oy:0.62},{ox:0.28,oy:0.73},{ox:0.67,oy:0.68},{ox:0.82,oy:0.52}];
+  for(var i=0;i<WALLS.length;i++){
+    (function(idx){
+      var w=WALLS[idx],p=WPOS[idx];
+      addObj({id:'w'+idx,x:p.ox*ww(),y:p.oy*wh(),w:58,h:55,label:w.day,
+        html:'<div style="width:100%;height:100%;cursor:pointer;border:1px solid rgba(200,147,58,0.18);background:rgba(200,147,58,0.03);display:flex;align-items:center;justify-content:center;"><span style="font-family:\'VT323\',monospace;font-size:13px;color:rgba(200,147,58,0.55);">'+w.day+'</span></div>',
+        onInteract:function(){readWall(idx);},onExamine:function(){readWall(idx);}});
+    })(i);
+  }
+  var wpHtml='';
+  for(var i=0;i<5;i++)wpHtml+='<div id="wp'+i+'" class="w-6 h-6 flex items-center justify-center border border-parchment/12 font-pixel text-parchment/22 text-sm">'+(i+1)+'</div>';
+  setPuzzle('<div class="font-title text-candle/52 text-[0.58rem] tracking-[0.3em] uppercase mb-1.5">HERNANDO\'S WRITINGS</div>'
+    +'<div class="flex gap-1 flex-wrap mb-1">'+wpHtml+'</div>'
+    +'<p class="font-body italic text-parchment/28 text-xs">Walk to each glowing marker and press E.</p>'
+    +pFb('wfb'));
+  dlg([
+    {speaker:'NARRATION',text:'Elias descends. Dark. Flashlight barely cuts through.'},
+    {speaker:'ELIAS',text:'Papa built all of this. Three years down here alone.'},
+    {speaker:'NARRATION',text:'Read all five wall entries. Walk to each marker and press E.'},
+  ]);
+}
+function readWall(i){
+  if(wallsRead[i])return;wallsRead[i]=true;
+  var w=WALLS[i];
+  var o=null;for(var j=0;j<objects.length;j++){if(objects[j].id==='w'+i){o=objects[j];break;}}
+  if(o){o.collected=true;var el=qs('o_w'+i);if(el)el.style.filter='brightness(1.8)';}
+  var wp=qs('wp'+i);if(wp)wp.className='w-6 h-6 flex items-center justify-center border border-candle/48 bg-candle/10 font-pixel text-candle text-sm';
+  dlg([{speaker:'NARRATION',text:w.day+': '+w.text},{speaker:'ELIAS',text:w.reply}],function(){
+    var cnt=0;for(var k in wallsRead)if(wallsRead[k])cnt++;
+    if(cnt>=5)allWallsDone();
+  });
+}
+function allWallsDone(){
+  setFb('wfb','All entries read. The door at the end glows.',true);
+  dlg([
+    {speaker:'HERNANDO',text:"(from beyond) Who's there?"},
+    {speaker:'ELIAS',text:"Papa. It's me. It's Elias."},
+    {speaker:'HERNANDO',text:"...I don't remember what you looked like as a child. I'm sorry. They took that too."},
+    {speaker:'ELIAS',text:"It's okay, Papa. I'm here now. I'm right here."},
+  ],function(){setPuzzle(pBtn('&#9658; PUSH OPEN THE DOOR',"doTrans('LEVEL 4 — THE RITUAL SITE',startLevel4)"));});
+}
+
+var CNAMES=['VOID','MOON','EYE','HAND','FLAME'];
+function startLevel4(){
+  G.level=4;showScreen('scrGame');clearLog();candlesOut=[];
+  G.px=ww()*0.28;G.py=wh()*0.76;
+  setRoom('rr','LEVEL 4','THE RITUAL SITE');setBgImg(A.BG_OLDHOUSE,0.18);
+  var W=ww(),H=wh();
+  var circleSvg='';
+  for(var i=0;i<5;i++){
+    var a=(i/5)*Math.PI*2-Math.PI/2;
+    var r=180,cx2=450+Math.cos(a)*r,cy2=345+Math.sin(a)*r;
+    circleSvg+='<line x1="450" y1="345" x2="'+cx2+'" y2="'+cy2+'" stroke="rgba(200,147,58,0.055)" stroke-width="1"/>';
+  }
+  for(var i=0;i<5;i++){
+    var a1=(i/5)*Math.PI*2-Math.PI/2,a2=((i+2)/5)*Math.PI*2-Math.PI/2,r2=132;
+    circleSvg+='<line x1="'+(450+Math.cos(a1)*r2)+'" y1="'+(345+Math.sin(a1)*r2)+'" x2="'+(450+Math.cos(a2)*r2)+'" y2="'+(345+Math.sin(a2)*r2)+'" stroke="rgba(200,147,58,0.07)" stroke-width="1"/>';
+  }
+  setDeco(
+    '<rect x="0" y="400" width="900" height="200" fill="#080504"/>'
+    +'<rect x="0" y="0" width="900" height="405" fill="#0a0604"/>'
+    +'<circle cx="450" cy="345" r="185" fill="none" stroke="rgba(200,147,58,0.16)" stroke-width="2"/>'
+    +'<circle cx="450" cy="345" r="132" fill="none" stroke="rgba(200,147,58,0.09)" stroke-width="1.5"/>'
+    +circleSvg
+    +'<circle cx="450" cy="345" r="58" fill="rgba(200,147,58,0.025)"/>'
+    +'<rect x="378" y="198" width="144" height="72" fill="#1e1608" rx="3" stroke="rgba(200,147,58,0.1)" stroke-width="1"/>'
+    +'<rect x="22" y="138" width="135" height="198" fill="#2a2218" stroke="rgba(200,180,150,0.09)" stroke-width="1" rx="1"/>'
+    +'<text fill="rgba(200,180,150,0.52)" font-family="Courier Prime,monospace" font-size="7.5" x="30" y="162">If you find this —</text>'
+    +'<text fill="rgba(200,180,150,0.42)" font-family="Courier Prime,monospace" font-size="7.5" x="30" y="177">extinguish the candles.</text>'
+    +'<text fill="rgba(200,180,150,0.38)" font-family="Courier Prime,monospace" font-size="7.5" x="30" y="197">Void. Moon. Eye.</text>'
+    +'<text fill="rgba(200,180,150,0.38)" font-family="Courier Prime,monospace" font-size="7.5" x="30" y="211">Hand. Flame.</text>'
+    +'<text fill="rgba(200,180,150,0.32)" font-family="Courier Prime,monospace" font-size="7.5" x="30" y="227">In that order.</text>'
+    +'<text fill="rgba(200,180,150,0.22)" font-family="Courier Prime,monospace" font-size="7" x="30" y="245">— H</text>'
+  );
+  addNPC('hernando',W*0.5,H*0.68,'#3a2535','HERNANDO','hernando');
+  for(var i=0;i<CNAMES.length;i++){
+    (function(idx){
+      var name=CNAMES[idx];
+      var a=(idx/5)*Math.PI*2-Math.PI/2;
+      var r=0.21*Math.min(W,H);
+      var cx=W*0.5+Math.cos(a)*r,cy=H*0.57+Math.sin(a)*r*0.68;
+      addObj({id:'c'+idx,x:cx-22,y:cy-46,w:44,h:52,label:'Candle: '+name,
+        html:'<div id="cd'+idx+'" style="width:100%;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;cursor:pointer;padding-bottom:3px;">'
+          +'<div class="flame" id="cflame'+idx+'" style="margin-bottom:2px;"></div>'
+          +'<div style="width:8px;height:26px;background:#3a2e1e;border-radius:2px 2px 0 0;"></div>'
+          +'<div style="width:12px;height:4px;background:#2a2015;border-radius:1px;"></div>'
+          +'<div style="font-family:\'VT323\',monospace;font-size:13px;color:rgba(200,147,58,0.48);margin-top:2px;">'+name+'</div>'
+          +'</div>',
+        onInteract:function(){doExtinguish(idx,name);},
+        onExamine:function(){dlg([{speaker:'ELIAS',text:'The '+name.toLowerCase()+' candle. Must be done in order.'}]);}});
+    })(i);
+  }
+  // inject candle images via DOM after render
+  var CLIT=[A.C_VOID_LIT,A.C_MOON_LIT,A.C_EYE_LIT,A.C_HAND_LIT,A.C_FLAME_LIT];
+  setTimeout(function(){
+    for(var ci=0;ci<5;ci++){
+      (function(n){
+        var cd=qs('cd'+n);
+        if(cd&&CLIT[n]){
+          var cimg=document.createElement('img');
+          cimg.id='cimg'+n;
+          cimg.src=CLIT[n];
+          cimg.style.cssText='height:55px;object-fit:contain;margin-bottom:2px;';
+          cimg.onerror=function(){this.style.display='none';};
+          var fl=cd.querySelector('.flame');
+          if(fl){cd.insertBefore(cimg,fl);fl.style.display='none';}
+          else cd.insertBefore(cimg,cd.firstChild);
+        }
+      })(ci);
+    }
+  },200);
+  addObj({id:'note',x:18,y:H*0.24,w:142,h:205,label:'Read the note',html:'',
+    onInteract:function(){dlg([{speaker:'ELIAS',text:'(reading) "Extinguish the candles. Void. Moon. Eye. Hand. Flame. In that order."'},{speaker:'ELIAS',text:"He wrote this for me. He always knew I'd come."}]);},
+    onExamine:function(){dlg([{speaker:'ELIAS',text:"Papa's handwriting. He left this for me."}]);}});
+  var cpHtml='';
+  for(var i=0;i<CNAMES.length;i++)cpHtml+='<div id="cp'+i+'" class="px-1.5 py-0.5 font-title text-[0.5rem] tracking-wider border border-parchment/10 text-parchment/22">'+CNAMES[i]+'</div>';
+  setPuzzle('<div class="font-title text-candle/52 text-[0.58rem] tracking-[0.3em] uppercase mb-1.5">RITUAL CANDLES</div>'
+    +'<p class="font-body italic text-parchment/32 text-xs mb-2">Read the wall note, then: Void → Moon → Eye → Hand → Flame</p>'
+    +'<div class="flex gap-1 flex-wrap" id="cProg">'+cpHtml+'</div>'
+    +pFb('rcfb'));
+  dlg([
+    {speaker:'NARRATION',text:'Elias enters. Hernando stands at the center of a circle. Candles everywhere.'},
+    {speaker:'HERNANDO',text:"I knew you'd come eventually."},
+    {speaker:'ELIAS',text:'Papa. Look at yourself.'},
+    {speaker:'HERNANDO',text:'You look like your mother. I forgot that.'},
+    {speaker:'ELIAS',text:'We need to leave. Right now.'},
+    {speaker:'HERNANDO',text:"I'm not leaving. I'm close."},
+    {speaker:'HERNANDO',text:'Bringing Ann home.'},
+    {speaker:'ELIAS',text:"Papa. The ritual is wrong."},
+    {speaker:'HERNANDO',text:"I know. But I have nothing else left."},
+    {speaker:'ELIAS',text:'You still have me, Papa.'},
+    {speaker:'HERNANDO',text:"(quietly) There's a note on the wall. Read it. Do what it says. Please."},
+  ]);
+}
+function doExtinguish(i,name){
+  var exp=CNAMES[candlesOut.length];
+  if(name!==exp){var prev=candlesOut.length>0?candlesOut[candlesOut.length-1]:'nothing';setFb('rcfb',"That's not right. The ritual collapses...",false);rFlash();setTimeout(function(){startLevel(4);},1200);return;}
+  candlesOut.push(name);
+  var cd=qs('cd'+i);
+  if(cd){
+    var cimgEl=qs('cimg'+i);
+    var COUT=[A.C_VOID_OUT,A.C_MOON_OUT,A.C_EYE_OUT,A.C_HAND_OUT,A.C_FLAME_OUT];
+    if(cimgEl&&COUT[i]){cimgEl.src=COUT[i];}
+    else{var fl=cd.querySelector('.flame');if(fl)fl.remove();}
+    cd.style.opacity='0.4';
+    cd.style.filter='grayscale(0.7)';
+  }
+  var o=null;for(var j=0;j<objects.length;j++){if(objects[j].id==='c'+i){o=objects[j];break;}}
+  if(o)o.collected=true;
+  var cp=qs('cp'+i);if(cp)cp.className='px-1.5 py-0.5 font-title text-[0.5rem] tracking-wider border border-candle/38 text-candle line-through';
+  dlg([{speaker:'ELIAS',text:name[0]+name.slice(1).toLowerCase()+'.'}]);
+  if(name==='EYE')dlg([{speaker:'HERNANDO',text:"(quietly) I just wanted to hear her laugh one more time. That's all I wanted."}]);
+  if(name==='FLAME'){
+    setFb('rcfb','The circle goes dark. The candles die.',true);
+    dlg([{speaker:'ELIAS',text:"(quietly) I'm going to tell you everything you forgot, Papa. Every single thing. I promise."}],function(){setTimeout(endingSequence,700);});
+  } else {
+    setFb('rcfb',candlesOut.length+' of 5. Next: '+CNAMES[candlesOut.length],true);
+  }
+}
+
+function endingSequence(){
+  showScreen('scrGame');clearLog();
+  setRoom('re','EPILOGUE','OUTSIDE — MORNING');setBgImg(A.BG_ABANDONED,0.25);
+  G.px=ww()*0.4;G.py=wh()*0.72;
+  clearObjects();clearPuzzle();
+  var grassSvg='<rect x="0" y="0" width="900" height="600" fill="#060d04"/>'
+    +'<ellipse cx="450" cy="0" rx="420" ry="260" fill="rgba(200,185,100,0.055)"/>'
+    +'<rect x="0" y="428" width="900" height="172" fill="#060f04"/>';
+  for(var i=0;i<55;i++){grassSvg+='<rect x="'+(i*17+Math.sin(i)*5)+'" y="'+(438+Math.sin(i*0.7)*16)+'" width="2" height="'+(7+Math.cos(i)*4)+'" fill="rgba(35,72,18,0.48)" rx="1"/>';}
+  setDeco(grassSvg
+    +'<circle cx="375" cy="400" r="3" fill="rgba(195,215,95,0.68)" style="filter:blur(1px)"/>'
+    +'<circle cx="525" cy="382" r="2" fill="rgba(195,215,95,0.52)" style="filter:blur(1px)"/>'
+    +'<circle cx="612" cy="395" r="2" fill="rgba(195,215,95,0.45)" style="filter:blur(1px)"/>');
+  addNPC('hernando2',ww()*0.33,wh()*0.72,'#3a2535','HERNANDO','hernando');
+  addNPC('ann',ww()*0.60,wh()*0.72,'#1a3545','ANN','ann');
+  dlg([
+    {speaker:'NARRATION',text:'Hernando collapses. Elias catches him.'},
+    {speaker:'ELIAS',text:'PAPA!'},
+    {speaker:'NARRATION',text:'Then — a faint light from the center of the broken circle.'},
+    {speaker:'NARRATION',text:'Ann steps out. Not a ghost. Not a remnant. Just Ann. Small. Ten years old. Exactly as she was.'},
+    {speaker:'ANN',text:'Elias?'},
+    {speaker:'ELIAS',text:'(voice breaking) Ann.'},
+    {speaker:'ANN',text:'(running to him) You came back.'},
+    {speaker:'ELIAS',text:"I came back. I'm sorry it took so long. I'm so sorry."},
+    {speaker:'ANN',text:"(to Hernando) Papa. It's me. It's Ann."},
+    {speaker:'HERNANDO',text:"(eyes opening) I can't see your face clearly anymore. They took that from me."},
+    {speaker:'ANN',text:'(squeezing his hand) Then look harder.'},
+    {speaker:'HERNANDO',text:'(whispering) There you are.'},
+    {speaker:'ANN',text:"I'm right here, Papa. I never left. Not really."},
+    {speaker:'HERNANDO',text:"I forgot your laugh. I forgot your birthday. I forgot everything."},
+    {speaker:'ANN',text:"I know. It's okay."},
+    {speaker:'HERNANDO',text:"It's not okay. I forgot my own daughter."},
+    {speaker:'ANN',text:"You also spent three years in a dark basement trying to bring me home. So I think we're even."},
+    {speaker:'NARRATION',text:'Hernando laughs. Just once. Short and broken. But real.'},
+    {speaker:'ELIAS',text:'(quietly) There it is.'},
+    {speaker:'ANN',text:'What?'},
+    {speaker:'ELIAS',text:"Papa's laugh. I forgot what it sounded like too."},
+  ],function(){setPuzzle(pBtn('&#9658; EPILOGUE','showEnding()'));});
+}
+
+
+var ELINES=[
+  {t:'n',v:'Outside. Morning. The three of them sit in the grass.'},
+  {t:'g'},{t:'c',s:'HERNANDO',v:'"I can\'t remember your birthday."'},
+  {t:'c',s:'ANN',v:'"March 3rd."'},{t:'c',s:'HERNANDO',v:'"The same day as The Collapse."'},
+  {t:'c',s:'ANN',v:'"Yeah. Worst birthday ever."'},{t:'g'},
+  {t:'c',s:'HERNANDO',v:'"I can\'t remember what you liked for breakfast."'},
+  {t:'c',s:'ANN',v:'"Toast. Folded in half."'},{t:'c',s:'HERNANDO',v:'"You got that from me."'},
+  {t:'c',s:'ANN',v:'"I know. I never told you that."'},{t:'g'},
+  {t:'c',s:'HERNANDO',v:'"I\'m sorry I didn\'t call you. I was ashamed."'},
+  {t:'c',s:'ELIAS',v:'"I\'m sorry I left. I should have stayed."'},
+  {t:'c',s:'ANN',v:'"Are you two done? Good. Can we go home now? I\'ve been in a dark basement for three years and I would really like some toast."'},
+  {t:'g'},{t:'n',v:'Elias laughs. Hernando laughs. Ann smiles.'},{t:'g'},
+  {t:'n',v:'A firefly blinks in the grass. Once. Twice. Gone.'},{t:'g'},
+  {t:'c',s:'ELIAS',v:'(quietly) "Firefly."'},{t:'c',s:'ANN',v:'(smiling) "You still call me that?"'},
+  {t:'c',s:'ELIAS',v:'"Always."'},{t:'g'},{t:'n',v:'Fade to black.'},
+];
+function showEnding(){
+  showScreen('scrEnding');
+  var el=qs('endTxt');el.innerHTML='';
+  var wrap=qs('endWrap');
+  var cols={ELIAS:'text-candle',HERNANDO:'text-pink-300/80',ANN:'text-emerald-300/80'};
+  var i=0;
+  var iv=setInterval(function(){
+    if(i>=ELINES.length){
+      clearInterval(iv);
+      var fin=ce('div','mt-14');
+      fin.innerHTML='<div class="font-title text-candle/58 text-3xl tracking-[0.35em] mb-8">— END —</div>'
+        +'<div class="flex gap-4 justify-center"><button onclick="restartGame()" class="font-title text-candle border border-candle/35 px-10 py-3 tracking-[0.3em] uppercase text-sm hover:bg-candle/10 hover:border-candle transition-all duration-300">PLAY AGAIN</button></div>';
+      wrap.appendChild(fin);spawnFireflies();return;
+    }
+    var line=ELINES[i];var p=ce('p');
+    if(line.t==='g'){p.innerHTML='&nbsp;';}
+    else if(line.t==='n'){p.className='font-body italic text-parchment/42 text-base leading-loose mb-0';p.textContent=line.v;}
+    else{var c=cols[line.s]||'text-candle';p.innerHTML='<span class="font-title text-sm '+c+' tracking-wider">'+line.s+':</span><span class="font-body text-parchment/85 text-base"> '+line.v+'</span>';}
+    el.appendChild(p);wrap.scrollTop=wrap.scrollHeight;i++;
+  },640);
+}
+function spawnFireflies(){
+  for(var k=0;k<5;k++){
+    (function(delay){
+      setTimeout(function(){
+        var ff=ce('div');
+        ff.style.cssText='position:fixed;width:4px;height:4px;border-radius:50%;background:rgba(200,220,95,0.9);box-shadow:0 0 8px rgba(200,220,95,0.7);pointer-events:none;z-index:99;left:'+(18+Math.random()*64)+'%;top:'+(18+Math.random()*64)+'%;animation:fly '+(6+Math.random()*4)+'s ease-in-out forwards;';
+        document.body.appendChild(ff);setTimeout(function(){ff.remove();},11000);
+      },delay);
+    })(k*1100);
+  }
+}
+
+function startLevel(n){
+  G.level=n;G.flags={};G.paused=false;G.dlgOpen=false;_spriteCache={};
+  dlgQ=[];dlgActive=false;
+  papersFound=0;foundDrawings=[];boardState=[null,null,null,null,null];
+  selCard=null;wallsRead={};candlesOut=[];
+  if(n===1)startLevel1();
+  else if(n===2)startLevel2();
+  else if(n===3)startLevel3();
+  else if(n===4)startLevel4();
+}
+function restartGame(){
+  G.inv=[];pIdx=0;qs('invItems').innerHTML='';showScreen('scrTitle');
+}
+
+(function(){
+  var c=qs('titleFx');
+  var positions=['12% 58%','22% 74%','38% 80%','62% 78%','78% 70%','88% 58%','50% 82%','8% 72%','92% 74%'];
+  var html='';
+  for(var i=0;i<positions.length;i++){
+    var parts=positions[i].split(' ');
+    var op=(0.25+Math.random()*0.38).toFixed(2);
+    var dur=(1.4+Math.random()*0.8).toFixed(1);
+    var del=(Math.random()*1.5).toFixed(1);
+    var h=(14+Math.random()*16).toFixed(0);
+    html+='<div style="position:absolute;left:'+parts[0]+';top:'+parts[1]+';display:flex;flex-direction:column;align-items:center;opacity:'+op+';animation:cflame '+dur+'s ease-in-out infinite '+del+'s;">'
+      +'<div style="width:7px;height:11px;background:radial-gradient(ellipse at 50% 82%,#fff 0%,#ffe566 25%,#c8933a 55%,transparent 100%);border-radius:50% 50% 28% 28%;box-shadow:0 0 10px 3px rgba(200,147,58,0.42);"></div>'
+      +'<div style="width:6px;height:'+h+'px;background:#3a2e1e;border-radius:1px;margin-top:-1px;"></div>'
+      +'<div style="width:10px;height:3px;background:#2a2015;border-radius:1px;"></div>'
+      +'</div>';
+  }
+  c.innerHTML=html;
+})();
+
+
+</script>
+
+</body>
+</html>
