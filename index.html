@@ -32,37 +32,35 @@ input[type=number]{-moz-appearance:textfield;}
 #ttxt{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-family:'Special Elite',cursive;color:#c8933a;font-size:1rem;letter-spacing:0.4em;text-transform:uppercase;opacity:0;transition:opacity 0.3s 0.15s;}
 #tov.show #ttxt{opacity:1;}
 #rf{position:fixed;inset:0;background:rgba(75,12,12,0.45);z-index:150;pointer-events:none;opacity:0;transition:opacity 0.08s;}
-.kb{display:inline-flex;align-items:center;justify-content:center;width:26px;height:26px;background:rgba(200,147,58,0.22);border:2px solid rgba(200,147,58,0.8);font-family:'VT323',monospace;font-size:16px;color:#e8b050;}
+.kb{display:inline-flex;align-items:center;justify-content:center;width:30px;height:30px;background:rgba(200,147,58,0.30);border:2px solid rgba(200,147,58,1.0);font-family:'VT323',monospace;font-size:18px;color:#ffc060;text-shadow:0 0 8px rgba(200,147,58,0.6);}
 </style>
 </head>
 <body class="w-screen h-screen overflow-hidden bg-ink text-parchment font-body select-none">
 <div id="tov"><div id="ttxt"></div></div>
 <div id="rf"></div>
 
-<!-- TITLE -->
 <div class="screen active flex-col items-center justify-center" id="scrTitle">
   <div class="absolute inset-0 z-0" style="background:#000;"></div>
   <div class="vig absolute inset-0 z-0 pointer-events-none"></div>
   <div class="absolute inset-0 pointer-events-none z-[1]" id="titleFx"></div>
   <div class="relative z-10 flex flex-col items-center">
     <img src="https://drive.google.com/thumbnail?id=10UMIQbfMWOEWTVnSQgPW44mXjB6tRVlx&sz=w600" class="relative z-10 w-72 md:w-96 mb-2 drop-shadow-[0_0_40px_rgba(200,147,58,0.4)]" alt="REMNANTS" onerror="this.style.display='none';document.getElementById('titleFallback').style.display='block'"><h1 id="titleFallback" class="font-title text-candle animate-flicker text-center" style="font-size:clamp(3rem,10vw,7rem);letter-spacing:0.35em;text-shadow:0 0 60px rgba(200,147,58,0.4);display:none">REMNANTS</h1>
-    <p class="font-body italic text-white/95 tracking-[0.22em] text-base mt-2">a game about memory and what we leave behind</p>
-    <p class="font-body italic text-parchment/65 text-sm tracking-widest mt-14 mb-5">After The Collapse, only memories remain.</p>
+    <p class="font-body italic text-white tracking-[0.22em] text-lg mt-2">a game about memory and what we leave behind</p>
+    <p class="font-body italic text-white/90 text-sm tracking-widest mt-14 mb-5">After The Collapse, only memories remain.</p>
     <button onclick="startPrologue()" class="font-title text-candle border-2 border-candle/80 px-14 py-4 tracking-[0.35em] uppercase text-base hover:bg-candle/20 hover:border-candle transition-all duration-300" style="text-shadow:0 0 20px rgba(200,147,58,0.5);">ENTER THE HOUSE</button>
     <div class="mt-10 flex flex-col items-center gap-2">
-      <div class="font-title text-[0.75rem] tracking-[0.3em] text-candle mb-2">CONTROLS</div>
-      <div class="flex items-center gap-3 font-pixel text-white text-lg">
+      <div class="font-title text-base tracking-[0.3em] text-candle mb-2">CONTROLS</div>
+      <div class="flex items-center gap-3 font-pixel text-white text-xl">
         <div class="flex flex-col items-center gap-0.5"><span class="kb">W</span><div class="flex gap-0.5"><span class="kb">A</span><span class="kb">S</span><span class="kb">D</span></div></div>
-        <span class="text-white/90 text-sm">MOVE</span>
-        <span class="kb">E</span><span class="text-white/90 text-sm">INTERACT</span>
+        <span class="text-white text-base font-bold">MOVE</span>
+        <span class="kb">E</span><span class="text-white text-base font-bold">INTERACT</span>
         
-        <span class="kb px-1" style="width:auto">SPC</span><span class="text-white/90 text-sm">NEXT</span>
+        <span class="kb px-1" style="width:auto">SPC</span><span class="text-white text-base font-bold">NEXT</span>
       </div>
     </div>
   </div>
 </div>
 
-<!-- PROLOGUE -->
 <div class="screen flex-col items-center justify-end pb-12" id="scrPrologue">
   <div class="rl absolute inset-0 z-0"></div>
   <div class="vig absolute inset-0 z-0 pointer-events-none"></div>
@@ -73,11 +71,10 @@ input[type=number]{-moz-appearance:textfield;}
       <div id="plgTxt" class="font-body text-white text-xl leading-relaxed min-h-[2.5rem]"></div>
       <div id="plgDots" class="flex gap-2 mt-3"></div>
     </div>
-    <button onclick="advancePrologue()" class="mt-2 w-full font-title text-candle/75 border border-candle/22 py-2 tracking-[0.3em] uppercase text-xs hover:bg-candle/8 hover:border-candle/55 hover:text-candle transition-all duration-200">&#9658; CONTINUE</button>
+    <button onclick="advancePrologue()" class="mt-2 w-full font-title text-white border-2 border-candle/70 py-2 tracking-[0.3em] uppercase text-sm hover:bg-candle/8 hover:border-candle/55 hover:text-candle transition-all duration-200">&#9658; CONTINUE</button>
   </div>
 </div>
 
-<!-- GAME -->
 <div class="screen flex-row items-stretch" id="scrGame">
   <div class="flex-1 relative overflow-hidden" id="wWrap">
     <div id="rBg" class="absolute inset-0 z-0"></div>
@@ -89,32 +86,31 @@ input[type=number]{-moz-appearance:textfield;}
     <div class="vig absolute inset-0 z-[12] pointer-events-none"></div>
     <div class="absolute top-0 inset-x-0 z-[13] flex items-center justify-between px-4 py-2 bg-gradient-to-b from-ink/75 to-transparent pointer-events-none">
       <div><div id="hLvl" class="font-title text-candle text-[0.7rem] tracking-[0.4em]">LEVEL 1</div><div id="hRoom" class="font-title text-white text-base tracking-wide">THE LIVING ROOM</div></div>
-      <div class="flex items-center gap-2 font-pixel text-parchment/35 text-sm"><span class="kb">E</span><span>interact</span><span class="ml-1 kb px-1" style="width:auto">SPC</span><span>next</span></div>
+      <div class="flex items-center gap-2 font-pixel text-white/85 text-base"><span class="kb">E</span><span class="text-white/85">interact</span><span class="ml-1 kb px-1" style="width:auto">SPC</span><span class="text-white/85">next</span></div>
     </div>
     <div id="pLabel" class="absolute z-[13] hidden pointer-events-none" style="transform:translateX(-50%);"><div class="font-pixel text-candle text-base bg-ink/85 border border-candle/35 px-2 py-0.5 whitespace-nowrap"></div></div>
     <div id="dlgBox" class="absolute bottom-0 inset-x-0 z-[14] p-3">
       <div class="bg-ink border border-parchment/20 border-t-[3px] border-t-candle px-6 py-4 relative">
         <div id="dlgSpk" class="font-title text-candle text-sm tracking-[0.3em] absolute -top-3 left-5 bg-ink px-2"></div>
         <div id="dlgTxt" class="font-body text-white text-lg leading-relaxed min-h-[1.8rem]"></div>
-        <div class="absolute bottom-2 right-4 font-pixel text-candle/70 text-sm animate-p2">SPC / E ▼</div>
+        <div class="absolute bottom-2 right-4 font-pixel text-candle text-base animate-p2">SPC / E ▼</div>
       </div>
     </div>
   </div>
-  <div class="w-72 border-l border-parchment/20 flex flex-col overflow-hidden" style="min-width:255px;background:rgba(10,8,6,0.97);">
-    <div class="px-4 py-3 border-b border-candle/12 bg-candle/4">
+  <div class="w-72 border-l border-white/25 flex flex-col overflow-hidden" style="min-width:255px;background:rgba(10,8,6,0.97);">
+    <div class="px-4 py-3 border-b border-candle/30 bg-candle/10">
       <div id="pLvl" class="font-title text-candle text-[0.7rem] tracking-[0.4em]">LEVEL 1</div>
       <div id="pRoom" class="font-title text-white text-base tracking-wide mt-0.5">THE LIVING ROOM</div>
     </div>
     <div id="storyLog" class="flex-1 overflow-y-auto px-4 py-3 scb space-y-3"></div>
-    <div id="puzzleArea" class="px-4 py-3 border-t border-parchment/8"></div>
+    <div id="puzzleArea" class="px-4 py-3 border-t border-white/15"></div>
     <div class="px-4 py-3 border-t border-parchment/8">
-      <div class="font-title text-[0.62rem] tracking-[0.3em] text-candle/80 mb-1.5">INVENTORY</div>
+      <div class="font-title text-[0.62rem] tracking-[0.3em] text-candle mb-1.5">INVENTORY</div>
       <div id="invItems" class="flex flex-wrap gap-1"></div>
     </div>
   </div>
 </div>
 
-<!-- ENDING -->
 <div class="screen flex-col items-center justify-center" id="scrEnding">
   <div class="re absolute inset-0 z-0"></div>
   <div class="vig absolute inset-0 z-0 pointer-events-none"></div>
@@ -125,7 +121,6 @@ input[type=number]{-moz-appearance:textfield;}
 
 <script>
 
-// ── ASSETS ──────────────────────────────────────────
 var A={
   BG_OLDHOUSE:"https://drive.google.com/thumbnail?id=17c_Zj-aBtQnJOS_qHkmKU0yTYF7rqKBz&sz=w1200",
   BG_ABANDONED:"https://drive.google.com/thumbnail?id=1sPFVPUalm0my9S8WF8WrBnxltc4qb8_P&sz=w1200",
@@ -136,7 +131,7 @@ var A={
   ANN_S:"https://drive.google.com/thumbnail?id=1EqWLGmaGJ6t7ydhrg1GDHwuY0VxePJSq&sz=w200",
   HERNANDO_S:"https://drive.google.com/thumbnail?id=13q0Y8Q52suvn6fqjl5gd7pgR4M0eSKlL&sz=w200",
   GHOST_S:"https://drive.google.com/thumbnail?id=1Qz1qTK4BW0Tjq-itJs8208oVaEVWp3sx&sz=w200",
-  // Elias directional sprites
+  
   ELIAS_N:"https://drive.google.com/thumbnail?id=1_y8TSoeXIeYgvEdnlECVdUY7sVa9G_Nj&sz=w200",
   ELIAS_S:"https://drive.google.com/thumbnail?id=1LHWVGVMjDUx35PVp79tCwIWIlBUSFm4d&sz=w200",
   ELIAS_E:"https://drive.google.com/thumbnail?id=1jZKORWW1N-adpYXTE3kH5sIq4blQyPpu&sz=w200",
@@ -145,7 +140,7 @@ var A={
   ELIAS_NW:"https://drive.google.com/thumbnail?id=1uftCYAu9s-ToFyWxB9EcD7DlqDgi3a7Y&sz=w200",
   ELIAS_SE:"https://drive.google.com/thumbnail?id=13yQ9WbR_uukf4NN2i-PimAyrq7SjsBFk&sz=w200",
   ELIAS_SW:"https://drive.google.com/thumbnail?id=1mE28gXS1WpbuR7upG2V_1nBPk-12a2N8&sz=w200",
-  // Ann directional sprites
+  
   ANN_N:"https://drive.google.com/thumbnail?id=1UxK2aVKNfUluep1m-N2bnXVJGmvYE9RO&sz=w200",
   ANN_S:"https://drive.google.com/thumbnail?id=1EqWLGmaGJ6t7ydhrg1GDHwuY0VxePJSq&sz=w200",
   ANN_E:"https://drive.google.com/thumbnail?id=19aLOux1bfaMMfC34GS9HsL9b5IrQqzys&sz=w200",
@@ -154,7 +149,7 @@ var A={
   ANN_NW:"https://drive.google.com/thumbnail?id=1Dp3bvoPoxDa1aUPIFRD1XzLgUzu2A_U9&sz=w200",
   ANN_SE:"https://drive.google.com/thumbnail?id=1VO6J6Nw3_qf5ImsFYnMY24gzBS8eMy3w&sz=w200",
   ANN_SW:"https://drive.google.com/thumbnail?id=1zHxwCIbM4Hx0hZH_KDa04UAq1C2YygA7&sz=w200",
-  // Hernando directional sprites
+  
   HER_N:"https://drive.google.com/thumbnail?id=1sn1IMGDtXcGOxw3Vtx7RfZ7lR7yRkNQ6&sz=w200",
   HER_S:"https://drive.google.com/thumbnail?id=13q0Y8Q52suvn6fqjl5gd7pgR4M0eSKlL&sz=w200",
   HER_E:"https://drive.google.com/thumbnail?id=1qnXE6CxyTd2TgZaR7SYm02NiCRDoB4Xv&sz=w200",
@@ -163,11 +158,11 @@ var A={
   HER_NW:"https://drive.google.com/thumbnail?id=1uxJPmwlDS7IiiCgR3o9udtKHf9rBosK5&sz=w200",
   HER_SE:"https://drive.google.com/thumbnail?id=1PbiXGwKwqpd0MSPCFT4aQ54c3ek7xJR3&sz=w200",
   HER_SW:"https://drive.google.com/thumbnail?id=1OD2jSwTcYb51i23YkZQmv5Ue9uE0W2ZO&sz=w200",
-  // Newspapers scattered
+  
   NP1:"https://drive.google.com/thumbnail?id=1ZcmOPxubOs-9ltEh7kPLpWqLSE2W2IfV&sz=w300",
   NP2:"https://drive.google.com/thumbnail?id=1U9lFk-yEl1nf8r6RXnTf5Cu_l-7GCL8E&sz=w300",
   NP3:"https://drive.google.com/thumbnail?id=14I4r3CHZoLkfVA14b7uvnjTgoedm9x8W&sz=w300",
-  // Newspapers with numbers
+  
   NP_7:"https://drive.google.com/thumbnail?id=1LS3PTeTRKYJ8KUYWeKZz3wjrMCEck6ro&sz=w400",
   NP_33:"https://drive.google.com/thumbnail?id=1GuQdZAVJ_Ugp9dWCcMQDlDWjg2Uum4eh&sz=w400",
   NP_30:"https://drive.google.com/thumbnail?id=1kmNv59L4KOOjCtaxjKlGNQXFF-APcYaF&sz=w400",
@@ -182,13 +177,12 @@ var A={
   C_HAND_OUT:"https://drive.google.com/thumbnail?id=1P5KeBqGP9_XP2-Wg9ts_JxKSNZN-pT9H&sz=w120",
   C_FLAME_OUT:"https://drive.google.com/thumbnail?id=1PUvtQxoT3xA52UEz-iGss56O096dSP28&sz=w120",
 };
-// ── HELPERS ──────────────────────────────────────────
+
 function qs(id){return document.getElementById(id);}
 function ce(tag,cls,html){var el=document.createElement(tag);if(cls)el.className=cls;if(html)el.innerHTML=html;return el;}
 function showScreen(id){document.querySelectorAll('.screen').forEach(function(s){s.classList.remove('active');});qs(id).classList.add('active');}
 function rFlash(){var f=qs('rf');f.style.opacity='1';setTimeout(function(){f.style.opacity='0';},110);}
 
-// ── TRANSITION ───────────────────────────────────────
 function doTrans(txt,cb,ms){
   ms=ms||1300;
   qs('ttxt').textContent=txt;
@@ -196,13 +190,11 @@ function doTrans(txt,cb,ms){
   setTimeout(function(){if(cb)cb();setTimeout(function(){qs('tov').classList.remove('show');},550);},ms);
 }
 
-// ── STATE ────────────────────────────────────────────
 var G={level:0,inv:[],flags:{},keys:{},px:400,py:300,pdir:'south',pmoving:false,pframe:0,pfT:0,paused:false,nearObj:null,dlgOpen:false,dlgCb:null,typeIv:null,plgIv:null};
 var objects=[], dlgQ=[], dlgActive=false;
 var papersFound=0, foundDrawings=[], boardState=[null,null,null,null,null], selCard=null;
 var wallsRead={}, candlesOut=[], pIdx=0;
 
-// ── INPUT ────────────────────────────────────────────
 document.addEventListener('keydown',function(e){
   var k=e.key.toLowerCase();
   G.keys[k]=true;
@@ -211,7 +203,6 @@ document.addEventListener('keydown',function(e){
 });
 document.addEventListener('keyup',function(e){G.keys[e.key.toLowerCase()]=false;});
 
-// ── DIALOGUE ─────────────────────────────────────────
 function dlg(lines,onDone){
   dlgQ=[];
   for(var i=0;i<lines.length;i++){
@@ -248,13 +239,12 @@ function advanceDlg(){
 function handleInteract(){if(G.dlgOpen){advanceDlg();return;}if(G.nearObj&&G.nearObj.onInteract)G.nearObj.onInteract();}
 function handleExamine(){if(G.dlgOpen)return;if(G.nearObj&&G.nearObj.onExamine)G.nearObj.onExamine();else if(G.nearObj&&G.nearObj.onInteract)G.nearObj.onInteract();}
 
-// ── LOG ──────────────────────────────────────────────
 function logEntry(speaker,text){
   var area=qs('storyLog');
   var d=ce('div','animate-fadeUp');
   var cols={ELIAS:'text-candle',HERNANDO:'text-pink-300/80',ANN:'text-emerald-300/80',UNKNOWN:'text-blue-300/70'};
   if(speaker==='NARRATION'){
-    d.innerHTML='<p class="font-body italic text-sm leading-relaxed text-white/95 border-l-2 border-candle/60 pl-2">'+text+'</p>';
+    d.innerHTML='<p class="font-body italic text-sm leading-relaxed text-white border-l-2 border-candle pl-2">'+text+'</p>';
   } else {
     var c=cols[speaker]||'text-candle';
     d.innerHTML='<div class="font-title text-xs tracking-[0.2em] '+c+' mb-0.5">'+speaker+'</div><p class="font-body text-base leading-relaxed text-white/95">'+text+'</p>';
@@ -264,25 +254,22 @@ function logEntry(speaker,text){
 }
 function clearLog(){qs('storyLog').innerHTML='';}
 
-// ── PUZZLE ───────────────────────────────────────────
-function pBtn(lbl,fn){return '<button onclick="'+fn+'" class="w-full font-title text-candle border border-candle/70 py-2 text-[0.75rem] tracking-[0.18em] hover:bg-candle/20 hover:border-candle transition-all duration-200 mt-1">'+lbl+'</button>';}
+function pBtn(lbl,fn){return '<button onclick="'+fn+'" class="w-full font-title text-candle border-2 border-candle py-2 text-[0.8rem] tracking-[0.18em] hover:bg-candle/25 hover:border-candle transition-all duration-200 mt-1">'+lbl+'</button>';}
 function pFb(id){id=id||'pfb';return '<div id="'+id+'" class="font-body italic text-xs min-h-[1rem] mt-1.5"></div>';}
-function setFb(id,txt,ok){var el=qs(id);if(!el)return;el.textContent=txt;el.className='font-body italic text-sm min-h-[1rem] mt-1.5 font-semibold '+(ok?'text-emerald-400':'text-red-400');}
-function numIn(id){return '<input id="'+id+'" type="number" min="0" max="99" placeholder="?" class="w-12 bg-parchment/10 border border-parchment/40 text-white font-pixel text-center text-xl py-0.5 outline-none focus:border-candle transition-colors"/>';}
+function setFb(id,txt,ok){var el=qs(id);if(!el)return;el.textContent=txt;el.className='font-body italic text-sm min-h-[1rem] mt-1.5 font-bold '+(ok?'text-emerald-300':'text-red-300');}
+function numIn(id){return '<input id="'+id+'" type="number" min="0" max="99" placeholder="?" class="w-12 bg-white/12 border-2 border-white/65 text-white font-pixel text-center text-xl py-0.5 outline-none focus:border-candle transition-colors"/>';}
 function setPuzzle(html){qs('puzzleArea').innerHTML=html;}
 function clearPuzzle(){qs('puzzleArea').innerHTML='';}
 
-// ── INVENTORY ────────────────────────────────────────
 function addItem(name,icon,id){
   if(G.inv.indexOf(id)>=0)return;G.inv.push(id);
-  var el=ce('div','bg-parchment/5 border border-parchment/12 px-1.5 py-0.5 font-title text-[0.52rem] tracking-wide text-white/90 hover:border-candle/40 hover:text-candle transition-all cursor-default relative');
+  var el=ce('div','bg-parchment/5 border border-parchment/12 px-1.5 py-0.5 font-title text-[0.52rem] tracking-wide text-white hover:border-candle/60 hover:text-candle transition-all cursor-default relative');
   el.textContent=icon+' '+name;
   var dot=ce('span','absolute -top-1 -right-1 text-candle text-[9px]');dot.textContent='•';
   el.appendChild(dot);qs('invItems').appendChild(el);
   setTimeout(function(){dot.remove();},2800);
 }
 
-// ── OBJECTS ──────────────────────────────────────────
 function clearObjects(){objects=[];qs('objLayer').innerHTML='';qs('npcLayer').innerHTML='';}
 function addObj(o){
   objects.push(o);
@@ -298,9 +285,8 @@ function addObj(o){
 function dist(o){return Math.hypot(G.px-(o.x+o.w/2),G.py-(o.y+o.h/2));}
 function getNear(){var best=null,bd=88;for(var i=0;i<objects.length;i++){var o=objects[i];if(o.collected)continue;var d=dist(o);if(d<bd){bd=d;best=o;}}return best;}
 
-// ── PLAYER SPRITE ────────────────────────────────────
 var walkFrames=[[0,0,0,0],[2,-3,-2,3],[3,-5,-3,5],[2,-3,-2,3]];
-// Map direction to sprite URL key
+
 function getDirKey(char,dir){
   var map={
     north:'N',south:'S',east:'E',west:'W',
@@ -315,7 +301,7 @@ function renderPlayer(){
   var dir=G.pdir;
   var key=getDirKey('ELIAS',dir);
   var imgUrl=A[key]||A.ELIAS_S;
-  // Only update if direction changed or first render
+  
   if(_spriteCache.elias===key&&!G.pmoving)return;
   _spriteCache.elias=key;
   sp.innerHTML='';
@@ -323,7 +309,7 @@ function renderPlayer(){
   img.src=imgUrl;
   img.style.cssText='height:220px;object-fit:contain;image-rendering:pixelated;filter:drop-shadow(0 6px 14px rgba(0,0,0,0.85));display:block;';
   img.onerror=function(){
-    // fallback to CSS sprite
+    
     this.style.display='none';
     sp.innerHTML=fallbackPlayerSVG(dir);
   };
@@ -381,21 +367,20 @@ function addNPC(id,x,y,shirt,label,imgKey){
   el.style.cssText='position:absolute;left:'+(x-40)+'px;top:'+(y-160)+'px;';
   el.innerHTML=fallbackNPC(shirt,label);
   qs('npcLayer').appendChild(el);
-  // overlay real image if available
+  
   if(imgKey&&NPC_IMGS[imgKey]){
     var wrap=el.querySelector('div')||el;
     var imgEl=document.createElement('img');
     imgEl.src=NPC_IMGS[imgKey];
     imgEl.style.cssText='height:160px;object-fit:contain;filter:drop-shadow(0 6px 14px rgba(0,0,0,0.85));display:block;margin:0 auto;image-rendering:pixelated;';
     imgEl.onerror=function(){this.style.display='none';};
-    // insert before the svg
+    
     var svg=el.querySelector('svg');
     if(svg)svg.parentNode.insertBefore(imgEl,svg);
     else el.insertBefore(imgEl,el.firstChild);
   }
 }
 
-// ── GAME LOOP ────────────────────────────────────────
 var SPEED=2.6;
 function ww(){return qs('wWrap').clientWidth;}
 function wh(){return qs('wWrap').clientHeight;}
@@ -412,7 +397,7 @@ function loop(ts){
     if(dn){dy=SPEED;}
     if(lt){dx=-SPEED;}
     if(rt){dx=SPEED;}
-    // Set direction including diagonals
+    
     if(up&&rt)G.pdir='northeast';
     else if(up&&lt)G.pdir='northwest';
     else if(dn&&rt)G.pdir='southeast';
@@ -449,7 +434,6 @@ function updateHint(){
   } else {ring.classList.add('hidden');lbl.classList.add('hidden');}
 }
 
-// ── ROOM SETUP ───────────────────────────────────────
 function setBgImg(url,opacity){
   opacity=opacity||0.55;
   var b=qs("rBg");
@@ -468,7 +452,6 @@ function setRoom(bgCls,lvl,room){
 }
 function setDeco(svg){qs('rDeco').innerHTML='<svg class="w-full h-full" viewBox="0 0 900 600" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">'+svg+'</svg>';}
 
-// ── PROLOGUE ─────────────────────────────────────────
 var PROLOGUE=[
   {spk:'ELIAS',txt:"Papa always locked this door. Always."},
   {spk:'NARRATION',txt:"He steps inside. The smell hits him — burnt wax and rot."},
@@ -486,7 +469,7 @@ function startPrologue(){
     +'</div>'
     +'<div id="plgChar" style="position:absolute;bottom:-6px;left:50%;transform:translateX(-50%);min-height:44px;"></div>'
     +'</div>';
-  // inject Elias sprite image
+  
   var plgChar=qs('plgChar');
   if(plgChar&&A.ELIAS_S){
     var eImg=document.createElement('img');
@@ -516,7 +499,6 @@ function advancePrologue(){
   typePrologue();
 }
 
-// ── LEVEL 1: LIVING ROOM ─────────────────────────────
 function startLevel1(){
   G.level=1;showScreen('scrGame');clearLog();
   G.px=ww()*0.5;G.py=wh()*0.72;
@@ -552,7 +534,7 @@ function startLevel1(){
     +'<ellipse cx="639" cy="358" rx="11" ry="14" fill="rgba(200,147,58,0.45)" style="filter:blur(3px)"/>'
     +'<ellipse cx="639" cy="354" rx="5" ry="6" fill="rgba(255,220,80,0.85)"/>'
   );
-  // Inject real newspaper images over SVG positions
+  
   setTimeout(function(){
     var W2=ww(),H2=wh(),s2=W2/900,t2=H2/600;
     var nps=[
@@ -627,7 +609,6 @@ function checkClock(){
   } else {setFb('cfb','Nothing happens. The clock resets...',false);rFlash();setTimeout(function(){startLevel(1);},1200);}
 }
 
-// ── LEVEL 2: ANN'S ROOM ──────────────────────────────
 var DRAWINGS=[
   {id:'dr1',label:'Dark Door',emoji:'🚪',order:1,desc:'A door, drawn dozens of times. Always dark. Always locked.'},
   {id:'dr2',label:'Glowing Circle',emoji:'⭕',order:2,desc:'A circle of light. Like a sun but underground.'},
@@ -699,7 +680,7 @@ function collectDrawing(id){
 }
 function buildDrawPuzzle(){
   var slots='';
-  for(var i=0;i<5;i++)slots+='<div id="ds'+i+'" onclick="pinSlot('+i+')" class="aspect-square border border-dashed border-parchment/12 flex items-center justify-center text-xs cursor-pointer hover:border-candle/38 transition-colors text-parchment/22">'+(i+1)+'</div>';
+  for(var i=0;i<5;i++)slots+='<div id="ds'+i+'" onclick="pinSlot('+i+')" class="aspect-square border border-dashed border-white/35 flex items-center justify-center text-sm cursor-pointer hover:border-candle transition-colors text-white/75">'+(i+1)+'</div>';
   setPuzzle('<div class="font-title text-candle text-[0.7rem] tracking-[0.3em] uppercase mb-1">ANN\'S DRAWINGS</div>'
     +'<div class="font-title text-candle/70 text-[0.62rem] tracking-widest mb-1">BOARD — PIN IN ORDER:</div>'
     +'<div class="grid grid-cols-5 gap-1 mb-1.5" id="dBrd">'+slots+'</div>'
@@ -714,7 +695,7 @@ function refreshHand(){
     var id=foundDrawings[i];
     var d=null;for(var j=0;j<DRAWINGS.length;j++){if(DRAWINGS[j].id===id){d=DRAWINGS[j];break;}}
     var used=(boardState.indexOf(id)>=0);var sel=(selCard===id);
-    var cls=used?'opacity-30 pointer-events-none border-parchment/20 text-white/85':sel?'border-candle bg-candle/25 text-candle font-bold':'border-parchment/30 text-white/95 hover:border-candle/60 hover:text-candle';
+    var cls=used?'opacity-40 pointer-events-none border-white/20 text-white/55':sel?'border-candle bg-candle/25 text-candle font-bold':'border-white/45 text-white hover:border-candle hover:text-candle';
     html+='<div onclick="selDraw(\''+id+'\')" class="px-1.5 py-0.5 font-title text-[0.52rem] border cursor-pointer transition-all duration-200 '+cls+'">'+d.emoji+' '+d.label+'</div>';
   }
   h.innerHTML=html;
@@ -732,7 +713,7 @@ function refreshBoard(){
     var sl=qs('ds'+i);if(!sl)continue;
     var id=boardState[i];
     if(id){var d=null;for(var j=0;j<DRAWINGS.length;j++){if(DRAWINGS[j].id===id){d=DRAWINGS[j];break;}}sl.innerHTML='<span class="text-xl">'+d.emoji+'</span>';sl.className='aspect-square border border-candle/28 bg-candle/5 flex items-center justify-center cursor-pointer transition-colors';}
-    else{sl.innerHTML=String(i+1);sl.className='aspect-square border border-dashed border-parchment/12 flex items-center justify-center text-xs cursor-pointer hover:border-candle/38 transition-colors text-parchment/22';}
+    else{sl.innerHTML=String(i+1);sl.className='aspect-square border border-dashed border-white/35 flex items-center justify-center text-sm cursor-pointer hover:border-candle transition-colors text-white/75';}
   }
 }
 function checkBoard(){
@@ -748,7 +729,7 @@ function checkBoard(){
       {speaker:'ELIAS',text:"I'm sorry Ann. I have to find him."},
     ],function(){
       var codeInputs='';
-      for(var i=1;i<=4;i++)codeInputs+='<input id="k'+i+'" maxlength="1" type="text" placeholder="0" class="w-10 h-11 bg-parchment/10 border border-parchment/40 text-white font-pixel text-2xl text-center outline-none focus:border-candle transition-colors"/>';
+      for(var i=1;i<=4;i++)codeInputs+='<input id="k'+i+'" maxlength="1" type="text" placeholder="0" class="w-10 h-11 bg-white/12 border-2 border-white/65 text-white font-pixel text-2xl text-center outline-none focus:border-candle transition-colors"/>';
       setPuzzle('<div class="font-title text-candle text-[0.7rem] tracking-[0.3em] uppercase mb-1.5">BASEMENT DOOR</div>'
         +'<div class="flex gap-1 mb-2">'+codeInputs+'</div>'
         +pBtn('ENTER CODE','checkCode()')+pFb('kfb'));
@@ -767,7 +748,6 @@ function checkCode(){
   else{setFb('kfb','Wrong code. The door stays shut...',false);rFlash();setTimeout(function(){startLevel(2);},1200);}
 }
 
-// ── LEVEL 3: BASEMENT ────────────────────────────────
 var WALLS=[
   {day:'Day 3',text:'"I found her shoe under the stairs. Just one. I put it on the table so I wouldn\'t forget where I found it. I don\'t know why that matters. It just does."',reply:'(stopping) He was writing on the walls.'},
   {day:'Day 9',text:'"Elias still hasn\'t called. I keep picking up the phone to call him. I don\'t know what I would say. I put the phone down every time."',reply:'(quietly) Papa...'},
@@ -838,7 +818,6 @@ function allWallsDone(){
   ],function(){setPuzzle(pBtn('&#9658; PUSH OPEN THE DOOR',"doTrans('LEVEL 4 — THE RITUAL SITE',startLevel4)"));});
 }
 
-// ── LEVEL 4: RITUAL SITE ─────────────────────────────
 var CNAMES=['VOID','MOON','EYE','HAND','FLAME'];
 function startLevel4(){
   G.level=4;showScreen('scrGame');clearLog();candlesOut=[];
@@ -889,7 +868,7 @@ function startLevel4(){
         onExamine:function(){dlg([{speaker:'ELIAS',text:'The '+name.toLowerCase()+' candle. Must be done in order.'}]);}});
     })(i);
   }
-  // inject candle images via DOM after render
+  
   var CLIT=[A.C_VOID_LIT,A.C_MOON_LIT,A.C_EYE_LIT,A.C_HAND_LIT,A.C_FLAME_LIT];
   setTimeout(function(){
     for(var ci=0;ci<5;ci++){
@@ -957,7 +936,6 @@ function doExtinguish(i,name){
   }
 }
 
-// ── ENDING SEQUENCE ──────────────────────────────────
 function endingSequence(){
   showScreen('scrGame');clearLog();
   setRoom('re','EPILOGUE','OUTSIDE — MORNING');setBgImg(A.BG_ABANDONED,0.25);
@@ -998,7 +976,6 @@ function endingSequence(){
   ],function(){setPuzzle(pBtn('&#9658; EPILOGUE','showEnding()'));});
 }
 
-// ── EPILOGUE ─────────────────────────────────────────
 var ELINES=[
   {t:'n',v:'Outside. Morning. The three of them sit in the grass.'},
   {t:'g'},{t:'c',s:'HERNANDO',v:'"I can\'t remember your birthday."'},
@@ -1025,13 +1002,13 @@ function showEnding(){
     if(i>=ELINES.length){
       clearInterval(iv);
       var fin=ce('div','mt-14');
-      fin.innerHTML='<div class="font-title text-candle/58 text-3xl tracking-[0.35em] mb-8">— END —</div>'
+      fin.innerHTML='<div class="font-title text-candle text-3xl tracking-[0.35em] mb-8">— END —</div>'
         +'<div class="flex gap-4 justify-center"><button onclick="restartGame()" class="font-title text-candle border border-candle/35 px-10 py-3 tracking-[0.3em] uppercase text-sm hover:bg-candle/10 hover:border-candle transition-all duration-300">PLAY AGAIN</button></div>';
       wrap.appendChild(fin);spawnFireflies();return;
     }
     var line=ELINES[i];var p=ce('p');
     if(line.t==='g'){p.innerHTML='&nbsp;';}
-    else if(line.t==='n'){p.className='font-body italic text-white/85 text-base leading-loose mb-0';p.textContent=line.v;}
+    else if(line.t==='n'){p.className='font-body italic text-white/95 text-base leading-loose mb-0';p.textContent=line.v;}
     else{var c=cols[line.s]||'text-candle';p.innerHTML='<span class="font-title text-sm '+c+' tracking-wider">'+line.s+':</span><span class="font-body text-white/95 text-base"> '+line.v+'</span>';}
     el.appendChild(p);wrap.scrollTop=wrap.scrollHeight;i++;
   },640);
@@ -1048,7 +1025,6 @@ function spawnFireflies(){
   }
 }
 
-// ── LEVEL CONTROLLER ─────────────────────────────────
 function startLevel(n){
   G.level=n;G.flags={};G.paused=false;G.dlgOpen=false;_spriteCache={};
   dlgQ=[];dlgActive=false;
@@ -1063,8 +1039,6 @@ function restartGame(){
   G.inv=[];pIdx=0;qs('invItems').innerHTML='';showScreen('scrTitle');
 }
 
-
-// ── TITLE CANDLES ─────────────────────────────────────
 (function(){
   var c=qs('titleFx');
   var positions=['12% 58%','22% 74%','38% 80%','62% 78%','78% 70%','88% 58%','50% 82%','8% 72%','92% 74%'];
@@ -1083,8 +1057,6 @@ function restartGame(){
   }
   c.innerHTML=html;
 })();
-
-// Fix: startLevel2 was redefined — remove the wrapper
 
 </script>
 
